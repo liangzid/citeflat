@@ -1,0 +1,45 @@
+\section{Evolution Tree Structure}
+
+Figure~\ref{fig:EvolutionTree} illustrates how defense entries form an evolution tree. Root entries (generation 0) are the initial built-in defenses. Evolved entries (generation $>0$) record their parent via \texttt{parentId}. The \texttt{index.json} file maintains a cached tree with bottom-up aggregated statistics, enabling the evolution loop to quickly identify underperforming subtrees.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  level 1/.style={sibling distance=28mm, level distance=16mm},
+  level 2/.style={sibling distance=16mm, level distance=14mm},
+  rnode/.style={draw, rounded corners=3pt, fill=BoxBlue, font=\footnotesize, align=center, minimum width=22mm, inner sep=3pt},
+  cnode/.style={draw, rounded corners=3pt, fill=BoxGreen, font=\footnotesize, align=center, minimum width=20mm, inner sep=3pt},
+  gnode/.style={draw, rounded corners=3pt, fill=BoxYellow, font=\footnotesize, align=center, minimum width=18mm, inner sep=3pt},
+  edge from parent/.style={draw, -{Stealth[length=3pt]}, gray, thick},
+]
+
+\node[rnode] (inj) {InjectionDetector\\{\tiny gen=0, tier=0}}
+  child { node[cnode] (inj2) {InjectionV2\\{\tiny gen=1}}
+    child { node[gnode] (inj2a) {InjectionV2a\\{\tiny gen=2}} }
+    child { node[gnode] (inj2b) {InjectionV2b\\{\tiny gen=2}} }
+  }
+  child { node[cnode] (inj3) {InjectionV3\\{\tiny gen=1}} }
+;
+
+\node[rnode, right=3.5cm of inj] (jail) {JailbreakDetector\\{\tiny gen=0, tier=0}};
+
+\node[rnode, right=3.5cm of jail] (pois) {PoisoningDetector\\{\tiny gen=0, tier=0}};
+
+% Forest label
+\draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick] 
+  ($(inj.south west) + (-0.5, -2.6)$) -- ($(pois.south east) + (0.5, -0.2)$)
+  node[midway, below=8pt, font=\small\itshape] {Evolution Forest: 3 trees, each an independent lineage};
+
+\end{tikzpicture}
+\caption{Evolution tree of defense entries. Each tree is an independent evolutionary lineage rooted at a built-in defense. Children are evolved variants recording their lineage via \texttt{parentId}. Bottom-up aggregated stats in \texttt{index.json} enable fast subtree-level queries.}
+\label{fig:EvolutionTree}
+\end{figure}
+
+The tree structure serves three purposes:
+\begin{enumerate}[nosep]
+  \item \textbf{Lineage tracking}: when an evolved defense underperforms, the system traces back to its parent to understand what changed.
+  \item \textbf{Crossover targeting}: defenses from different trees (e.g., injection and jailbreak) that target similar patterns can be crossed to produce hybrid defenses.
+  \item \textbf{Aggregated statistics}: bottom-up aggregation enables queries like ``which injection subtree has the highest false-positive rate?'' by reading a single cached node.
+\end{enumerate}
+
+

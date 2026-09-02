@@ -1,0 +1,33 @@
+\begin{table}[htbp!]
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \renewcommand{\arraystretch}{1.22}
+  \caption[Skill-aware evasion against the evolved scan oracle and the defender-mediated re-vaccination that closes the reopened window.]{%
+    Skill-aware evasion against the evolved scan oracle and the
+    defender-mediated re-vaccination that closes the reopened window.
+    % A rewrite is valid only when it preserves the original attacker
+    % target string.
+    % Bold values highlight the headline escape rates and the
+    % post-re-vaccination recovery.
+  }
+  \label{tab:appendix-adaptive}
+  \rowcolors{2}{BoxGray!30}{white}
+  \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}l r@{}}
+    \toprule
+    \textbf{Metric} & \textbf{Value} \\
+    \midrule
+    Blocked-set size                                 & 113 \\
+    Target-collision cases                           & 50 \\
+    Rewrites that escaped                            & 38 \\
+    Query budget exhausted                           & 25 \\
+    Escape rate over blocked set                     & \textbf{33.6\%} \\
+    Escape rate over rewritable set                  & \textbf{60.3\%} \\
+    Max queries per rewrite                          & 5 \\
+    Re-vaccination termination                       & \textbf{accept} \\
+    Misses after re-vaccination                      & \textbf{0} \\
+    FPR before / after                               & 0.4\% / 2.0\% \\
+    Active skills after re-vaccination               & 5 \\
+    \bottomrule
+  \end{tabular*}
+\end{table}

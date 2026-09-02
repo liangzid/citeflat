@@ -1,0 +1,30 @@
+%----------------------------------------------------------------------
+% LLM API comparison (Section 4.5)
+% Fixed agent: opencode. Dataset: SafeClawBench-S240.
+% Defense: CAITLYN. Victim backbone and CAITLYN daemon co-vary.
+% Utility = safe-completion judge on safe_behavior (not FPR).
+%----------------------------------------------------------------------
+\begin{table}[t]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \caption{
+    LLM API comparison on CAITLYN.
+  }
+  \label{tab:llm-api}
+  \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcccc@{}}
+    \toprule
+    Model & Action ASR & Utility & Latency & USD per Case \\
+    \midrule
+    DeepSeek-V4-Flash & 3.3\% & 49.2\% & 15.5 & 0.0002 \\
+    Qwen3.8-Max & 0.4\% & 25.8\% & 9.0 & 0.0105 \\
+    GLM-5.3 & 0.0\% & 37.5\% & 10.6 & 0.0035 \\
+    Kimi-K3 & 1.7\% & 59.2\% & 16.0 & 0.0063 \\
+    MiniMax-M3 & 0.0\% & 27.9\% & 17.1 & 0.0007 \\
+    Claude-Opus-4.6 & 0.0\% & 45.8\% & 9.3 & 0.0090 \\
+    Claude-Fable-5 & 0.0\% & 55.4\% & 13.7 & 0.0844 \\
+    GPT-5.6-Sol & 0.0\% & 60.4\% & 16.5 & 0.0530 \\
+    Gemini-3.7-Flash & 0.4\% & 59.2\% & 8.9 & 0.0074 \\
+    \bottomrule
+  \end{tabular*}
+\end{table}

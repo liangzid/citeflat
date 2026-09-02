@@ -1,0 +1,23 @@
+\subsection{Defense Skill Inventory}
+\label{app:skill-inventory}
+
+\input{sections/appendix/tables/table-skill-inventory}
+
+The shipped library of CAITLYN contains 24 defense skills.
+Each skill is a self-contained directory whose YAML contract records the
+identifier, the execution tier, the role, the security category, and a
+human-readable detection target.
+Tier-0 skills additionally ship an executable detector script, while Tier-1
+skills ship a prompt contract that the merged-pair evaluator packs into its
+two parallel calls.
+Table~\ref{tab:appendix-skill-inventory} lists the complete inventory.
+The tier field determines the runtime path inside System~I.
+All 14 Tier-0 skills are preloaded into the signature engine and run on
+every scan at sub-millisecond cost.
+The 8 Tier-1 skills are executed only through the merged-pair evaluator
+after the escalation gate. The 2 entries tagged tier 2 have no
+independent verdict. They are packed only into the knowledge-scope call
+as reference knowledge, still inside System~I.
+The same folder interface is used by System~II when it materializes a new
+skill, so an evolved entry can replace a shipped entry without changing the
+runtime dispatch.

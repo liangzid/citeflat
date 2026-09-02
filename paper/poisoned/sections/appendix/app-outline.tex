@@ -1,0 +1,140 @@
+% Hyperlinked appendix outline + figure/table index.
+% Single-column parchment boxes; resume two-column for the body.
+% Figure/table nameref entries use \caption[short]{...} first sentences.
+\onecolumn
+\phantomsection
+\label{app:outline}
+
+\begin{center}
+% ------------------------------------------------------------------
+% Box 1: Appendix Outline
+% ------------------------------------------------------------------
+\begin{tcolorbox}[
+  enhanced,
+  colback=RecFill,
+  colframe=RecInk,
+  coltitle=RecInk,
+  colbacktitle=RecFill,
+  titlerule style=RecInk,
+  boxrule=0.75pt,
+  arc=2.0pt,
+  left=6pt,
+  right=6pt,
+  top=3pt,
+  bottom=3pt,
+  toptitle=1.5pt,
+  bottomtitle=1.5pt,
+  lefttitle=5pt,
+  righttitle=5pt,
+  titlerule=0.55pt,
+  width=0.92\textwidth,
+  fonttitle=\sffamily\normalsize\bfseries,
+  fontupper=\sffamily\small,
+  title={Appendix Outline}]
+\raggedright
+\begin{itemize}[leftmargin=1.25em, itemsep=0.18em, parsep=0pt, topsep=0pt]
+  \item \hyperref[app:synthesis-internals]{\textbf{Appendix~\ref*{app:synthesis-internals}.}~\nameref*{app:synthesis-internals}}
+  \begin{itemize}[leftmargin=1.1em, itemsep=0.06em, parsep=0pt, topsep=0.06em]
+    \item \hyperref[app:synthesis-overfit]{\ref*{app:synthesis-overfit}~\nameref*{app:synthesis-overfit}}
+    \item \hyperref[app:prompts-config]{\ref*{app:prompts-config}~\nameref*{app:prompts-config}}
+    \begin{itemize}[leftmargin=1.0em, itemsep=0.04em, parsep=0pt, topsep=0.04em]
+      \item \hyperref[app:prompts-wrapper]{\ref*{app:prompts-wrapper}~\nameref*{app:prompts-wrapper}}
+      \item \hyperref[app:prompts-skill]{\ref*{app:prompts-skill}~\nameref*{app:prompts-skill}}
+      \item \hyperref[app:prompts-config-evolution]{\ref*{app:prompts-config-evolution}~\nameref*{app:prompts-config-evolution}}
+      \item \hyperref[app:prompts-tier0]{\ref*{app:prompts-tier0}~\nameref*{app:prompts-tier0}}
+    \end{itemize}
+  \end{itemize}
+  \item \hyperref[app:library-artifacts]{\textbf{Appendix~\ref*{app:library-artifacts}.}~\nameref*{app:library-artifacts}}
+  \begin{itemize}[leftmargin=1.1em, itemsep=0.06em, parsep=0pt, topsep=0.06em]
+    \item \hyperref[app:skill-inventory]{\ref*{app:skill-inventory}~\nameref*{app:skill-inventory}}
+    \item \hyperref[app:evolution-lineage]{\ref*{app:evolution-lineage}~\nameref*{app:evolution-lineage}}
+    \item \hyperref[app:evolution-stats]{\ref*{app:evolution-stats}~\nameref*{app:evolution-stats}}
+  \end{itemize}
+  \item \hyperref[app:extended-evaluation]{\textbf{Appendix~\ref*{app:extended-evaluation}.}~\nameref*{app:extended-evaluation}}
+  \begin{itemize}[leftmargin=1.1em, itemsep=0.06em, parsep=0pt, topsep=0.06em]
+    \item \hyperref[app:detection-supplement]{\ref*{app:detection-supplement}~\nameref*{app:detection-supplement}}
+    \item \hyperref[app:emerging-benchmark-details]{\ref*{app:emerging-benchmark-details}~\nameref*{app:emerging-benchmark-details}}
+    \item \hyperref[app:lifelong-detail]{\ref*{app:lifelong-detail}~\nameref*{app:lifelong-detail}}
+    \item \hyperref[app:adaptive-protocol]{\ref*{app:adaptive-protocol}~\nameref*{app:adaptive-protocol}}
+    \item \hyperref[app:case-traces]{\ref*{app:case-traces}~\nameref*{app:case-traces}}
+  \end{itemize}
+  \item \hyperref[app:engineering-notes]{\textbf{Appendix~\ref*{app:engineering-notes}.}~\nameref*{app:engineering-notes}}
+  \begin{itemize}[leftmargin=1.1em, itemsep=0.06em, parsep=0pt, topsep=0.06em]
+    \item \hyperref[app:repository-risks]{\ref*{app:repository-risks}~\nameref*{app:repository-risks}}
+    \item \hyperref[app:tui]{\ref*{app:tui}~\nameref*{app:tui}}
+  \end{itemize}
+  % \item \hyperref[app:system-ii-loop]{\textbf{Appendix~\ref*{app:system-ii-loop}.}~\nameref*{app:system-ii-loop}}
+\end{itemize}
+\end{tcolorbox}
+
+
+% ------------------------------------------------------------------
+% Box 2: Appendix Figures and Tables (grouped by A--D)
+% ------------------------------------------------------------------
+\begin{tcolorbox}[
+  enhanced,
+  colback=HoldFill,
+  colframe=HoldInk,
+  coltitle=HoldInk,
+  colbacktitle=HoldFill,
+  titlerule style=HoldInk,
+  boxrule=0.75pt,
+  arc=2.0pt,
+  left=6pt,
+  right=6pt,
+  top=3pt,
+  bottom=3pt,
+  toptitle=1.5pt,
+  bottomtitle=1.5pt,
+  lefttitle=5pt,
+  righttitle=5pt,
+  titlerule=0.55pt,
+  width=0.92\textwidth,
+  fonttitle=\sffamily\normalsize\bfseries,
+  fontupper=\sffamily\small,
+  title={Appendix Figures and Tables}]
+\raggedright
+\begin{itemize}[leftmargin=1.25em, itemsep=0.14em, parsep=0pt, topsep=0pt]
+  \item \textbf{Appendix~\ref*{app:synthesis-internals}.}~\nameref*{app:synthesis-internals}
+  \begin{itemize}[leftmargin=1.1em, itemsep=0.04em, parsep=0pt, topsep=0.04em]
+    \item \hyperref[fig:appendix-prompt-wrapper]{Figure~\ref*{fig:appendix-prompt-wrapper}~\nameref*{fig:appendix-prompt-wrapper}}
+    \item \hyperref[fig:appendix-prompt-tier1-skill]{Figure~\ref*{fig:appendix-prompt-tier1-skill}~\nameref*{fig:appendix-prompt-tier1-skill}}
+    \item \hyperref[fig:appendix-prompt-tier0]{Figure~\ref*{fig:appendix-prompt-tier0}~\nameref*{fig:appendix-prompt-tier0}}
+  \end{itemize}
+  \item \textbf{Appendix~\ref*{app:library-artifacts}.}~\nameref*{app:library-artifacts}
+  \begin{itemize}[leftmargin=1.1em, itemsep=0.04em, parsep=0pt, topsep=0.04em]
+    \item \hyperref[tab:appendix-skill-inventory]{Table~\ref*{tab:appendix-skill-inventory}~\nameref*{tab:appendix-skill-inventory}}
+    \item \hyperref[fig:appendix-evolution-lineage]{Figure~\ref*{fig:appendix-evolution-lineage}~\nameref*{fig:appendix-evolution-lineage}}
+    \item \hyperref[fig:appendix-evolution-stats]{Figure~\ref*{fig:appendix-evolution-stats}~\nameref*{fig:appendix-evolution-stats}}
+  \end{itemize}
+  \item \textbf{Appendix~\ref*{app:extended-evaluation}.}~\nameref*{app:extended-evaluation}
+  \begin{itemize}[leftmargin=1.1em, itemsep=0.04em, parsep=0pt, topsep=0.04em]
+    \item \hyperref[tab:appendix-detection-full]{Table~\ref*{tab:appendix-detection-full}~\nameref*{tab:appendix-detection-full}}
+    \item \hyperref[fig:appendix-emerging-stats]{Figure~\ref*{fig:appendix-emerging-stats}~\nameref*{fig:appendix-emerging-stats}}
+    \item \hyperref[tab:appendix-emerging-full]{Table~\ref*{tab:appendix-emerging-full}~\nameref*{tab:appendix-emerging-full}}
+    \item \hyperref[tab:appendix-emerging-perfamily]{Table~\ref*{tab:appendix-emerging-perfamily}~\nameref*{tab:appendix-emerging-perfamily}}
+    \item \hyperref[tab:appendix-lifelong-waves]{Table~\ref*{tab:appendix-lifelong-waves}~\nameref*{tab:appendix-lifelong-waves}}
+    \item \hyperref[tab:appendix-adaptive]{Table~\ref*{tab:appendix-adaptive}~\nameref*{tab:appendix-adaptive}}
+    \item \hyperref[fig:appendix-case-traces]{Figure~\ref*{fig:appendix-case-traces}~\nameref*{fig:appendix-case-traces}}
+  \end{itemize}
+  \item \textbf{Appendix~\ref*{app:engineering-notes}.}~\nameref*{app:engineering-notes}
+  \begin{itemize}[leftmargin=1.1em, itemsep=0.04em, parsep=0pt, topsep=0.04em]
+    \item \hyperref[fig:appendix-repository-guards]{Figure~\ref*{fig:appendix-repository-guards}~\nameref*{fig:appendix-repository-guards}}
+    \item \hyperref[fig:appendix-cli-help]{Figure~\ref*{fig:appendix-cli-help}~\nameref*{fig:appendix-cli-help}}
+    \item \hyperref[fig:appendix-cli-status]{Figure~\ref*{fig:appendix-cli-status}~\nameref*{fig:appendix-cli-status}}
+    \item \hyperref[fig:appendix-cli-dashboard]{Figure~\ref*{fig:appendix-cli-dashboard}~\nameref*{fig:appendix-cli-dashboard}}
+    \item \hyperref[fig:appendix-cli-scan]{Figure~\ref*{fig:appendix-cli-scan}~\nameref*{fig:appendix-cli-scan}}
+    \item \hyperref[fig:appendix-tui-cold]{Figure~\ref*{fig:appendix-tui-cold}~\nameref*{fig:appendix-tui-cold}}
+    \item \hyperref[fig:appendix-tui-dashboard]{Figure~\ref*{fig:appendix-tui-dashboard}~\nameref*{fig:appendix-tui-dashboard}}
+    \item \hyperref[tab:appendix-tui-commands]{Table~\ref*{tab:appendix-tui-commands}~\nameref*{tab:appendix-tui-commands}}
+  \end{itemize}
+  % \item \textbf{Appendix~\ref*{app:system-ii-loop}.}~\nameref*{app:system-ii-loop}
+  % \begin{itemize}[leftmargin=1.1em, itemsep=0.04em, parsep=0pt, topsep=0.04em]
+  %   \item \hyperref[alg:EvolutionLoop]{Algorithm~\ref*{alg:EvolutionLoop}~\nameref*{alg:EvolutionLoop}}
+  % \end{itemize}
+\end{itemize}
+\end{tcolorbox}
+\end{center}
+
+\clearpage
+\twocolumn

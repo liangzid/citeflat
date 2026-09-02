@@ -1,0 +1,42 @@
+\begin{table}[h]
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \renewcommand{\arraystretch}{1.18}
+  \caption[Slash commands exposed by the CAITLYN terminal user interface.]{%
+    Slash commands exposed by the CAITLYN terminal user interface.
+    The upper block lists defense-facing commands.
+    The lower block lists session and configuration commands.
+  }
+  \label{tab:appendix-tui-commands}
+  \rowcolors{2}{BoxGray!30}{white}
+  \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}
+    >{\ttfamily\bfseries\raggedright\arraybackslash}p{0.46\columnwidth}
+    >{\raggedright\arraybackslash}p{0.42\columnwidth}
+    @{}}
+    \toprule
+    \multicolumn{1}{@{}l}{\textbf{Command}} &
+    \multicolumn{1}{l@{}}{\textbf{Purpose}} \\
+    \midrule
+    \rowcolor{white}
+    \multicolumn{2}{@{}l@{}}{\emph{Defense}} \\
+    /scan <content> & Single-shot scan \\
+    /status & Antibody and antigen library \\
+    /dashboard & Defense statistics \\
+    /history [N] & Recent scan history \\
+    /antibody list|add|remove & Library edits \\
+    /antigen <id> & Antigen details \\
+    /vaccinate <pattern> & Immune response \\
+    \midrule
+    \rowcolor{white}
+    \multicolumn{2}{@{}l@{}}{\emph{Session}} \\
+    /new, /resume, /session & Session management \\
+    /fork, /truncate, /tree & Branch navigation \\
+    /model, /thinking & Model controls \\
+    /login <provider> & Credential configuration \\
+    /settings, /help & Configuration and help \\
+    /export, /compact & Session artifacts \\
+    /clear, /quit & Session control \\
+    \bottomrule
+  \end{tabular*}
+\end{table}

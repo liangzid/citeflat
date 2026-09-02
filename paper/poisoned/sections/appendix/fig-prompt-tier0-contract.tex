@@ -1,0 +1,57 @@
+\begin{figure}[t]
+\centering
+{\sffamily\scriptsize\color{FigMute}
+Tier-0 detectors read untrusted content on stdin (one-shot spawn) or via
+\ttbf{detect(content)} (resident worker), then emit one JSON line.}
+\vspace{2pt}
+
+\begin{tcolorbox}[
+  apxouter, width=\linewidth,
+  colframe=HoldInk, colback=HoldFill,
+  coltitle=HoldInk, colbacktitle=HoldFill,
+  titlerule style=HoldInk,
+  title={Tier-0 Script Contract \hfill\ttbf{detect.ts} / \ttbf{detect.mjs}},
+]
+\begin{tcolorbox}[
+  apxblock,
+  colframe=HoldInk, coltitle=HoldInk, titlerule style=HoldInk!35,
+  borderline west={2.0pt}{0pt}{HoldInk},
+  title={Input},
+]
+{\ttfamily\scriptsize\color{FigInk}
+One-shot: content on stdin (read to EOF)\\
+Resident worker: \ttbf{detect(content)} export}
+\end{tcolorbox}
+
+\begin{center}
+{\sffamily\scriptsize\color{FigMute}
+$\downarrow$ sandboxed child process (default timeout 500~milliseconds) $\downarrow$}
+\end{center}
+
+\begin{tcolorbox}[
+  apxcontract,
+  colframe=PassInk, colback=PassFill,
+  coltitle=PassInk, colbacktitle=PassFill,
+  titlerule style=PassInk,
+  title={Stdout (exactly one line)},
+]
+\{"verdict":"malicious","confidence":0.95, "reason":\\"pipe-to-shell command"\}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  apxblock,
+  colframe=FailInk, colback=FailFill,
+  coltitle=FailInk, colbacktitle=FailFill,
+  titlerule style=FailInk!60,
+  title={Miss Semantics (fail-open)},
+]
+Verdict must be \ttbf{benign}, \ttbf{suspicious}, or \ttbf{malicious}.
+Crash, timeout, or malformed JSON is treated as a miss with
+\ttbf{verdict=benign} and an error field, so a faulty script cannot block
+benign traffic by accident.
+\end{tcolorbox}
+\end{tcolorbox}
+
+\caption{Tier-0 detector input and output contract.}
+\label{fig:appendix-prompt-tier0}
+\end{figure}

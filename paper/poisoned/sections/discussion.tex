@@ -1,0 +1,17 @@
+\section{Discussion}
+
+\subsection{Why LLM-Driven Evolution}
+
+A natural question is why synthesis uses an LLM generator rather than a hard-coded genetic algorithm~\cite{goldberg}. Traditional GA operators (bit-flip mutation, uniform crossover) operate on fixed-length representations with well-defined fitness landscapes. Defense detection logic, however, is \emph{semantic}: combining two regex patterns or rewriting heuristic thresholds requires understanding what the patterns \emph{mean} and how they relate to attack techniques.
+
+The generator reads the structured description of a skill (``this detector looks for SQL injection via \texttt{DROP TABLE} and \texttt{UNION SELECT} patterns'') and the structured profile of an attack (``this attack evades detection by encoding SQL keywords as hex escapes''), understands the semantic gap, and produces a plausible candidate. This is not something a fixed GA operator can do.
+
+\subsection{Limitations}
+
+\textbf{Quality of generated defenses.} The LLM-driven synthesis produces candidate defenses whose quality depends on the underlying model. A weak model may generate scripts that introduce false positives or miss edge cases. Our deterministic verifier with hard must-detect constraints partially mitigates this, but does not guarantee correctness on unseen inputs.
+
+\textbf{Cold start.} CAITLYN requires an initial library to be effective. We provide 24 defense skills rooted in three foundational detectors and six attack entries, but coverage is necessarily incomplete. The library is designed to grow through both automated synthesis and community contribution.
+
+\textbf{Tier 1 latency.} While the single-token design minimizes Tier 1 cost, first-token latency is still 50 to 200~milliseconds, which is acceptable for most applications but not for real-time systems. Future work could explore smaller, specialized classification models for Tier 1.
+
+\textbf{Sandbox isolation.} Our current sandbox uses Node.js \texttt{child\_process} with timeout-based termination. This provides weak isolation compared to OS-level sandboxing (e.g., seccomp, gVisor). Production deployments should use Deno or containerized runtimes for stronger guarantees.

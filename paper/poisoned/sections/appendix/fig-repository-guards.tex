@@ -1,0 +1,103 @@
+% Layered poisoning defenses on the repository update path (Appendix D.1).
+% Single-column stack. Ink language matches Figure~\ref{fig:EmergingCaseStudy}
+% and Figure~\ref{fig:EntryFormat} (parchment fill, Hold stroke, left spine).
+\begin{figure}[t]
+  \centering
+  \resizebox{0.96\columnwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\sffamily\scriptsize,
+    card/.style={
+      rounded corners=2.4pt,
+      line width=0.75pt,
+      draw=HoldInk,
+      fill=MetaFill,
+      inner xsep=5.5pt,
+      inner ysep=3.4pt,
+      align=left,
+      font=\sffamily\scriptsize,
+      text width=\dimexpr\columnwidth-40pt\relax,
+    },
+    idx/.style={
+      circle,
+      font=\sffamily\bfseries\tiny,
+      inner sep=0pt,
+      minimum size=10.5pt,
+      text=white,
+      fill=HoldInk,
+    },
+  ]
+    \node[idx] (i1) {1};
+    \node[card, right=8pt of i1] (c1) {%
+      {\color{HoldInk}\ttbf{L1}}
+      {\color{FigInk}\textbf{ Data Boundary}}\\[2pt]
+      {\color{FigMute}Raw trigger text never enters the generator prompt.
+        Only structured features and a similar-sample cluster do.}%
+    };
+    \node[
+      font=\sffamily\scriptsize\bfseries,
+      text=FigInk,
+      anchor=south west,
+    ] at ([yshift=5pt]c1.north west) {Local Update Path};
+
+    \node[card, below=8pt of c1.south west, anchor=north west] (c2) {%
+      {\color{HoldInk}\ttbf{L2}}
+      {\color{FigInk}\textbf{ Verification Sandbox}}\\[2pt]
+      {\color{FigMute}Deterministic verification is the trust anchor.
+        Signatures run in a child process with a timeout and static ReDoS
+        rejection.}%
+    };
+    \node[idx, anchor=east] (i2) at ([xshift=-8pt]c2.west) {2};
+
+    \node[card, below=8pt of c2.south west, anchor=north west] (c3) {%
+      {\color{HoldInk}\ttbf{L3}}
+      {\color{FigInk}\textbf{ Reviewer Hardening}}\\[2pt]
+      {\color{FigMute}The independent reviewer emits a strict JSON review
+        sheet and treats every candidate as code or data, not instructions.}%
+    };
+    \node[idx, anchor=east] (i3) at ([xshift=-8pt]c3.west) {3};
+
+    \node[card, below=8pt of c3.south west, anchor=north west] (c4) {%
+      {\color{HoldInk}\ttbf{L4}}
+      {\color{FigInk}\textbf{ Lesson Integrity}}\\[2pt]
+      {\color{FigMute}Lessons are append-only, schema-validated, and
+        originate only from verification or review output.}%
+    };
+    \node[idx, anchor=east] (i4) at ([xshift=-8pt]c4.west) {4};
+
+    \node[card, below=8pt of c4.south west, anchor=north west] (c5) {%
+      {\color{HoldInk}\ttbf{L5}}
+      {\color{FigInk}\textbf{ Resource Guards}}\\[2pt]
+      {\color{FigMute}Cooldown, daily evolution limits, per-run token
+        budgets, and maximum rounds bound the update path.}%
+    };
+    \node[idx, anchor=east] (i5) at ([xshift=-8pt]c5.west) {5};
+
+    \node[card, below=8pt of c5.south west, anchor=north west] (c6) {%
+      {\color{HoldInk}\ttbf{L6}}
+      {\color{FigInk}\textbf{ Retirement Protection}}\\[2pt]
+      {\color{FigMute}Only negative-score or descendant-covered nodes may
+        be demoted by rank, so healthy skills cannot be displaced.}%
+    };
+    \node[idx, anchor=east] (i6) at ([xshift=-8pt]c6.west) {6};
+
+    \begin{scope}[on background layer]
+      \draw[Spine, line width=1.2pt]
+        (i1.center) -- (i2.center) -- (i3.center)
+        -- (i4.center) -- (i5.center) -- (i6.center);
+      % Hold west bars, matching Figure~\ref{fig:EntryFormat} cards.
+      \foreach \c in {c1,c2,c3,c4,c5,c6} {
+        \fill[HoldInk]
+          ([xshift=0.6pt,yshift=-1.6pt]\c.north west)
+          rectangle
+          ([xshift=2.6pt,yshift=1.6pt]\c.south west);
+      }
+    \end{scope}
+  \end{tikzpicture}%
+  }
+  \caption[Six poisoning defenses on the local update path of the defense repository.]{%
+    Six poisoning defenses on the local update path of the defense
+    repository.
+    Layers are checked in order from L1 to L6.
+  }
+  \label{fig:appendix-repository-guards}
+\end{figure}

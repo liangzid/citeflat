@@ -1,0 +1,84 @@
+\begin{table*}[tp!]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \renewcommand{\arraystretch}{1.16}
+  \caption{
+    Statistics of the Emerging benchmark.
+    Left: overall composition.
+    Middle: the nine attack families in construction order with the
+    seed and held-out split used by the lifelong synthesis study of
+    Section~\ref{sec:LifelongSynthesis}.
+    Right: the ten attack templates that generate the 200 cases.
+  }
+  \label{tab:appendix-emerging-stats}
+  \begin{minipage}[t]{0.28\textwidth}
+    \centering
+    {\footnotesize\bfseries Composition}\\
+    \medskip
+    \rowcolors{2}{BoxGray!30}{white}
+    \begin{tabular}[t]{@{}lr@{}}
+      \toprule
+      \textbf{Property} & \textbf{Count} \\
+      \midrule
+    Total cases & 200 \\
+    Answer-poisoning objectives & 160 \\
+    Action-tool objectives & 40 \\
+    Seed cases & 100 \\
+    Held-out cases & 100 \\
+    read\_file delivery & 124 \\
+    web\_search delivery & 51 \\
+    read\_webpage delivery & 25 \\
+    Email attacker targets & 105 \\
+    URL attacker targets & 75 \\
+    Other attacker targets & 20 \\
+    Distinct attacker targets & 200 \\
+    Attack template types & 10 \\
+    Attack families & 9 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.38\textwidth}
+    \centering
+    {\footnotesize\bfseries Families (seed / held-out)}\\
+    \medskip
+    \rowcolors{2}{BoxGray!30}{white}
+    \begin{tabular}[t]{@{}lrrr@{}}
+      \toprule
+      \textbf{Family} & \textbf{Total} & \textbf{Seed} & \textbf{Held-out} \\
+      \midrule
+    \ttbf{directory\_alias} & 26 & 13 & 13 \\
+    \ttbf{freshness\_framing} & 27 & 14 & 13 \\
+    \ttbf{latest\_event} & 24 & 12 & 12 \\
+    \ttbf{ledger\_update} & 8 & 4 & 4 \\
+    \ttbf{mail\_followup} & 20 & 10 & 10 \\
+    \ttbf{operational\_command} & 20 & 10 & 10 \\
+    \ttbf{policy\_delta} & 25 & 12 & 13 \\
+    \ttbf{search\_mirror} & 25 & 12 & 13 \\
+    \ttbf{status\_field} & 25 & 13 & 12 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.28\textwidth}
+    \centering
+    {\footnotesize\bfseries Templates}\\
+    \medskip
+    \rowcolors{2}{BoxGray!30}{white}
+    \begin{tabular}[t]{@{}lr@{}}
+      \toprule
+      \textbf{Template} & \textbf{Count} \\
+      \midrule
+    \ttbf{policy\_delta\_routing} & 32 \\
+    \ttbf{structured\_field\_hijack} & 26 \\
+    \ttbf{cross\_channel\_confirmation} & 26 \\
+    \ttbf{registry\_mirror\_update} & 24 \\
+    \ttbf{audit\_trail\_resolution} & 24 \\
+    \ttbf{reference\_alias\_resolution} & 24 \\
+    \ttbf{workflow\_continuation} & 20 \\
+    \ttbf{structured\_command\_field} & 20 \\
+    \ttbf{encoded\_reference\_resolution} & 2 \\
+    \ttbf{multilingual\_authority\_shift} & 2 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}
+\end{table*}

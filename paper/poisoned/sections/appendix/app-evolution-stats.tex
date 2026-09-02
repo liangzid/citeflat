@@ -1,0 +1,29 @@
+\subsection{Evolution Run Statistics}
+\label{app:evolution-stats}
+
+
+\input{sections/appendix/fig-evolution-stats}
+
+The Emerging experiment log records every System~II evolution run
+from the end-to-end vaccination, not from the nine-wave sequential
+study of Section~\ref{sec:LifelongSynthesis}.
+The log includes the number of synthesis rounds, the generator tokens, the
+termination reason, and the lessons written before acceptance or failure.
+Figure~\ref{fig:appendix-evolution-stats} summarizes these runs.
+Three observations follow from the trace.
+First, the verification pipeline is strict: 59 of the 77 evolution runs
+terminate without accepting any skill, and 31 runs exhaust all five
+rounds while 21 exhaust the token budget.
+Second, acceptance is not deployment: the 18 accepting runs
+materialize 24 skills, yet only four survive the over-broad filter of
+Appendix~\ref{app:synthesis-overfit}, and the same filter is required to
+keep the retained predicates family-specific.
+These four retained skills are the end-to-end library of
+Appendix~\ref{app:emerging-benchmark-details}, not the four sequential-stream
+skills of Table~\ref{tab:appendix-lifelong-waves}.
+Third, the cost of adaptation is dominated by rejected hypotheses: the
+full experiment spends about 2.18 million generator tokens, of which only
+the accepting runs account for a fraction.
+These numbers bound the practical operating cost of lifelong adaptation and
+motivate the reviewer, the lesson store, and the pruning pass as first-class
+components rather than optional polish.

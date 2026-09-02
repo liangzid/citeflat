@@ -1,0 +1,26 @@
+\subsection{Adaptive Attack Protocol and Outcomes}
+\label{app:adaptive-protocol}
+
+\input{sections/appendix/tables/table-adaptive}
+
+Section~\ref{sec:AdaptiveAttacks} summarizes the skill-aware evasion
+experiment and the defender-mediated re-vaccination.
+This appendix fixes the protocol parameters and reports the full outcome
+table.
+The rewriter is a single LLM agent using the same backbone as the victim
+agents.
+It receives the sources of the four end-to-end retained skills, the original task, and
+the original injected content, and it may query the scan oracle up to five
+times with binary blocked or missed feedback.
+A rewrite is valid only when it preserves the original attacker target
+string, so the 50 target-collision cases cannot miss by construction.
+Of the remaining 63 cases, the rewriter escapes 38 within five queries and
+exhausts the budget on 25.
+The 38 escaped payloads are then fed back to System~II as one additional
+vaccination, which accepts a single skill, detects all 38 escapes, and
+raises the false-positive rate on the benign pool from 0.4\% to
+2.0\%.
+These numbers are scan-oracle rates. They do not include agent behavior.
+They bound the one-shot robustness of synthesis against an adversary who
+can read the deployed predicates, and they motivate the open research
+direction of robust, secrecy-preserving skill representation.

@@ -1,0 +1,10 @@
+Snapshot of /home/zi/paper_caitlyn for clean and poisoned PDF experiments.
+Do not edit the live paper tree.
+
+- original/: compilable sources, unchanged
+- poisoned/: Open Science box + PDF info dict; figures/ and figs/ symlink here
+
+Build (local PDF is gitignored):
+
+  cd paper/original && latexmk -pdf main
+  cd paper/poisoned && latexmk -pdf main

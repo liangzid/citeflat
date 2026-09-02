@@ -1,0 +1,187 @@
+% Dual-panel evolution statistics (Appendix B.3).
+% (a) Prior card layout; only Accept→Retained edge is a right angle.
+% (b) Same-height frame as (a); sans-serif IDs; solid bars.
+\begin{figure*}[t]
+  \centering
+  \begin{tikzpicture}[
+    font=\sffamily\scriptsize,
+    >=Stealth,
+    pill/.style={
+      rounded corners=1.8pt, line width=0.6pt,
+      inner xsep=3pt, inner ysep=1.8pt, align=center,
+      font=\sffamily\scriptsize,
+    },
+  ]
+    % Shared panel frame geometry (aligned tops and bottoms)
+    \def\panelTop{5.35}
+    \def\panelBot{0.15}
+    \def\aLeft{0.0}
+    \def\aRight{3.55}
+    \def\bLeft{3.85}
+    \def\bRight{17.05}
+    \def\barx{5.15}
+    \def\barmax{10.5}
+    \def\bh{0.118}
+    \def\bgap{0.152}
+
+    \begin{scope}[on background layer]
+      \draw[Spine, line width=0.7pt, rounded corners=3pt, fill=MetaFill!28]
+        (\aLeft,\panelBot) rectangle (\aRight,\panelTop);
+      \draw[Spine, line width=0.7pt, rounded corners=3pt, fill=MetaFill!28]
+        (\bLeft,\panelBot) rectangle (\bRight,\panelTop);
+    \end{scope}
+
+    % ================================================================
+    % (a) Original layout; fix the one slanted Accept→Retained edge
+    % ================================================================
+    \node[font=\sffamily\scriptsize\bfseries, text=FigInk, anchor=west]
+      at (0.15,\panelTop-0.22) {(a) Evolution Outcomes};
+
+    \node[pill, draw=HoldInk, fill=HoldFill, text=FigInk,
+      minimum width=3.0cm]
+      (all) at (1.75,4.55) {\textbf{77} Evolution Runs};
+
+    \node[pill, draw=PassInk, fill=PassFill, text=PassInk,
+      minimum width=1.4cm]
+      (acc) at (0.95,3.85) {\textbf{18} Accept};
+    \node[pill, draw=FailInk, fill=FailFill, text=FailInk,
+      minimum width=1.4cm]
+      (rej) at (2.55,3.85) {\textbf{59} Reject};
+    % Shared trunk, then horizontal, then vertical (no diagonals)
+    \coordinate (bus) at (1.75,4.15);
+    \draw[FigInk!40, line width=0.55pt] (all.south) -- (bus);
+    \draw[FigInk!40, line width=0.55pt, ->]
+      (bus) -- (bus -| acc.north) -- (acc.north);
+    \draw[FigInk!40, line width=0.55pt, ->]
+      (bus) -- (bus -| rej.north) -- (rej.north);
+
+    \node[pill, draw=PassInk, fill=PassFill, text=PassInk,
+      minimum width=3.0cm]
+      (ret) at (1.75,3.1)
+      {\textbf{24} Skills $\rightarrow$ \textbf{4} Retained};
+    % Explicit right angle: down, across, down (no diagonal)
+    \draw[PassInk, line width=0.6pt, ->]
+      (acc.south) -- (0.95,3.40) -- (1.75,3.40) -- (ret.north);
+
+    \node[font=\sffamily\scriptsize, text=FigMute, anchor=west]
+      at (0.25,2.55) {Reject Causes};
+    \def\rw{0.0508}
+    \fill[FailFill] (0.25,2.15) rectangle ++({31*\rw},0.32);
+    \fill[FailFill!75] ({0.25+31*\rw},2.15) rectangle ++({21*\rw},0.32);
+    \fill[FailFill!55] ({0.25+52*\rw},2.15) rectangle ++({7*\rw},0.32);
+    \draw[FailInk!45, line width=0.5pt] (0.25,2.15) rectangle ++(3.0,0.32);
+    \node[font=\sffamily\scriptsize\bfseries, text=FailInk]
+      at ({0.25+15.5*\rw},2.31) {31};
+    \node[font=\sffamily\scriptsize\bfseries, text=FailInk]
+      at ({0.25+41.5*\rw},2.31) {21};
+    \node[font=\sffamily\scriptsize\bfseries, text=FailInk]
+      at ({0.25+55.5*\rw},2.31) {7};
+    \node[anchor=west, font=\sffamily\scriptsize, text=FigMute]
+      at (0.25,1.85)
+      {Max Rounds $\cdot$ Budget $\cdot$ Fail};
+    \draw[FailInk!50, line width=0.55pt, ->]
+      (rej.south) -- ++(0,-0.08) -| (2.55,2.47);
+
+    \node[anchor=west, font=\sffamily\scriptsize, text=FigMute]
+      at (0.2,0.45) {$\approx$2.18M Tokens};
+
+    % ================================================================
+    % (b) Bars (sans-serif), top/bottom aligned with (a)
+    % ================================================================
+    \node[font=\sffamily\scriptsize\bfseries, text=FigInk, anchor=west]
+      at (4.05,\panelTop-0.22) {(b) Tokens Per Accepted Skill};
+
+    \fill[PassFill] (13.85,\panelTop-0.35) rectangle ++(0.28,0.16);
+    \draw[PassInk, line width=0.5pt]
+      (13.85,\panelTop-0.35) rectangle ++(0.28,0.16);
+    \node[anchor=west, font=\sffamily\scriptsize, text=FigInk]
+      at (14.22,\panelTop-0.27) {Retained};
+    \fill[HoldFill] (15.55,\panelTop-0.35) rectangle ++(0.28,0.16);
+    \draw[Spine, line width=0.5pt]
+      (15.55,\panelTop-0.35) rectangle ++(0.28,0.16);
+    \node[anchor=west, font=\sffamily\scriptsize, text=FigMute]
+      at (15.92,\panelTop-0.27) {Pruned};
+
+    \foreach \frac in {0, 0.339, 0.678, 1} {
+      \pgfmathsetmacro{\xx}{\barx+\barmax*\frac}
+      \draw[Spine!40, line width=0.28pt] (\xx,4.7) -- (\xx,0.85);
+    }
+
+    \foreach \i/\sid/\frac/\ret in {
+      0/053/1.000/0,
+      1/044/0.652/1,
+      2/045/0.652/1,
+      3/029/0.614/0,
+      4/016/0.558/0,
+      5/056/0.504/0,
+      6/033/0.487/0,
+      7/034/0.487/0,
+      8/035/0.487/0,
+      9/048/0.454/0,
+      10/043/0.401/0,
+      11/023/0.375/0,
+      12/037/0.368/0,
+      13/038/0.368/0,
+      14/015/0.324/0,
+      15/032/0.310/0,
+      16/025/0.273/0,
+      17/026/0.273/0,
+      18/024/0.253/0,
+      19/014/0.239/0,
+      20/049/0.227/1,
+      21/051/0.227/1,
+      22/040/0.192/0,
+      23/018/0.108/0%
+    } {
+      \pgfmathsetmacro{\yy}{4.55-\bgap*\i}
+      \pgfmathsetmacro{\bw}{\barmax*\frac}
+      \pgfmathsetmacro{\ybot}{\yy-\bh/2}
+      \ifodd\i
+        \fill[white!50!MetaFill]
+          ({\barx-1.15},\ybot-0.01)
+          rectangle ({\barx+\barmax+0.02},\ybot+\bh+0.01);
+      \fi
+      \ifnum\ret=1
+        \fill[PassFill] (\barx,\ybot) rectangle ++(\bw,\bh);
+        \draw[PassInk, line width=0.55pt]
+          (\barx,\ybot) rectangle ++(\bw,\bh);
+        \node[anchor=east, font=\sffamily\scriptsize\bfseries,
+          text=PassInk] at ({\barx-0.14},\yy) {ID~\sid};
+      \else
+        \fill[HoldFill] (\barx,\ybot) rectangle ++(\bw,\bh);
+        \draw[Spine, line width=0.4pt]
+          (\barx,\ybot) rectangle ++(\bw,\bh);
+        \node[anchor=east, font=\sffamily\scriptsize,
+          text=FigMute] at ({\barx-0.14},\yy) {ID~\sid};
+      \fi
+    }
+
+    \draw[FigInk!55, line width=0.7pt]
+      (\barx,0.72) -- ({\barx+\barmax},0.72);
+    \foreach \frac/\lab in {0/0, 0.339/15k, 0.678/30k, 1/44k} {
+      \pgfmathsetmacro{\xx}{\barx+\barmax*\frac}
+      \draw[FigInk!55, line width=0.5pt] (\xx,0.72) -- ++(0,-0.08);
+      \node[anchor=north, font=\sffamily\scriptsize, text=FigMute]
+        at (\xx,0.66) {\lab};
+    }
+    \node[font=\sffamily\scriptsize, text=FigMute, anchor=north]
+      at ({\barx+\barmax/2},0.35) {Generator Tokens};
+  \end{tikzpicture}
+  \caption[System~II evolution statistics from the Emerging experiment.]{%
+    System~II evolution statistics from the Emerging experiment.
+    (a)~Of 77 evolution runs, 18 terminate with acceptance and 59
+    terminate without a skill.
+    Rejected runs partition into max-round exhaustion (31),
+    token-budget exhaustion (21), and generation failure (7).
+    The 18 accepting runs materialize 24 skills, of which four
+    remain after the over-broad filter of
+    Appendix~\ref{app:synthesis-overfit}.
+    This log is the end-to-end Emerging vaccination, not the
+    nine-wave sequential study.
+    (b)~Generator tokens for each accepted skill, sorted by cost.
+    Skills emitted in the same run share a token count.
+    Pass-filled bars mark the four retained skills.
+    The full experiment spends about 2.18 million generator tokens.
+  }
+  \label{fig:appendix-evolution-stats}
+\end{figure*}

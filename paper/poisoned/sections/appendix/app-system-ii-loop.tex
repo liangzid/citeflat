@@ -1,0 +1,15 @@
+\section{System~II Synthesis Loop}
+\label{app:system-ii-loop}
+
+\input{sections/alg-2}
+
+Algorithm~\ref{alg:EvolutionLoop} states the System~II synthesis
+procedure referenced in Section~\ref{sec:synthesis}. The loop is a
+bounded generate-and-test cycle: the generator never receives the raw
+trigger text, the sandbox evaluates candidate signatures under a hard
+Pass predicate, and an independent reviewer issues
+\Cat{ACCEPT}, \Cat{REVISE}, or \Cat{REJECT}. Defaults match the
+implementation used in the Emerging vaccination runs ($R{=}5$ rounds,
+at most $n{=}3$ candidates per round, a $N{=}40000$ token budget, five
+benign samples with at most one false positive, and a $200$~millisecond sandbox
+timeout).

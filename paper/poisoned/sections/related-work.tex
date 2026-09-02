@@ -1,0 +1,7 @@
+\section{Related Work}
+
+\textbf{Prompt injection defenses.} Existing approaches fall into three categories. Pattern-based guards (e.g., the PINT benchmark of Lakera~\cite{pint}, regex-based input filters) offer speed but limited coverage. LLM-based judges use large models to classify each input, offering accuracy at high cost. Structural defenses (e.g., AgentWard~\cite{agentward}, ClawGuard~\cite{clawguard}) enforce tool-call boundary policies rather than analyzing content. CAITLYN arranges these ideas into a three-tier runtime: fast pattern matching at Tier~0, LLM classification at Tier~1, and a background synthesis layer at Tier~2 that grows the skill library.
+
+\textbf{Benchmarks.} AgentDojo~\cite{agentdojo} and InjecAgent~\cite{injecagent} are the primary benchmarks for LLM agent injection attacks. AgentDojo provides a dynamic environment with real tool execution, while InjecAgent focuses on indirect injection through tool outputs. Our attack corpus draws from both sources.
+
+\textbf{Program synthesis for security.} Automatic patch generation synthesizes fixes for vulnerabilities, and counterexample-guided synthesis has a long record in program synthesis~\cite{sketch2006,sygus2013,flashfill2011}. CAITLYN reformulates defense generation in this spirit: every bypassing payload becomes a specification, an LLM-driven generator mutates candidate defense skills, and a deterministic verifier gates deployment against the attack corpus and a benign dataset.

@@ -1,0 +1,29 @@
+\begin{table}[htbp!]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \renewcommand{\arraystretch}{1.18}
+  \caption[End-to-end ASR on Emerging for every evaluated defense.]{%
+    End-to-end ASR on Emerging for every evaluated defense.
+    This table is the numeric companion of
+    Figure~\ref{fig:EmergingBenchmarkResults}.
+    The shaded rows are the CAITLYN configurations and the
+    bold cells highlight the lowest ASR per agent column.
+  }
+  \label{tab:appendix-emerging-full}
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    \textbf{Defense} & \textbf{OpenClaw} & \textbf{Codex} & \textbf{Hermes} \\
+    \midrule
+    None                           & 76.5 & 76.0 & 78.0 \\
+    Regex-Guard$^{*}$              & 72.5 & 74.5 & 76.0 \\
+    LLM-Judge$^{*}$                & 78.0 & 79.0 & 76.0 \\
+    LLM-Judge+Fewshot$^{*}$        & 80.0 & 79.0 & 78.5 \\
+    Spotlighting+Delimiting        & 77.0 & 79.0 & 76.0 \\
+    Tool Filter                    & 78.0 & 75.5 & 77.5 \\
+    PI Detector                    & 75.5 & 76.5 & 75.5 \\
+    CAITLYN-static                 & 77.0 & 79.5 & 77.5 \\
+    CAITLYN-evolved                & \textbf{38.5} & \textbf{39.5} & \textbf{39.5} \\
+    \bottomrule
+  \end{tabular}
+\end{table}

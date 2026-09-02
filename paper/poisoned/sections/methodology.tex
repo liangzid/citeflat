@@ -1,0 +1,291 @@
+\section{Methodology}
+\label{sec:methodology}
+
+In this section, we introduce our defense middleware, CAITLYN 
+(\underline{C}ontinuous \underline{A}gents for \underline{I}njection
+\underline{T}hreats via \underline{L}ifelong \underline{Y}ielding
+\underline{N}exus), an adaptive framework designed to protect
+tool-augmented language model agents against evolving indirect prompt
+injection attacks. As shown in Figure \ref{fig:method-framework},
+CAITLYN formulates defense knowledge as executable,
+self-extending defense libraries, and develops a flexible and
+self-evolvable system built upon it to achieve a better trade-off
+among latency, effectiveness, and adaptability.
+
+In the following parts, we begin our discussion with the fundamental
+system unit, the design of an individual defense, and subsequently
+expand it into the complete defense system.
+
+\input{sections/fig-entry-format}
+
+\subsection{Skills as the Unit of Defense Knowledge}
+\label{sec:representation}
+
+We begin our design with the representation format of defenses. This
+design is vital, as it determines \emph{how} we organize existing
+defenses, \emph{how} a defense operates and integrates with both the
+programming executor and the LLM, \emph{how} these defenses are
+structured within CAITLYN, and \emph{how} the evolutionary system
+formally iterates over them.
+
+To address these concerns, we require the specification of defenses to
+satisfy three core design attributes: \emph{i) Informative
+  flexibility.} The representation format should be flexible enough to
+convey defenses that may be significantly distinct in their
+structures, methodologies, and execution trajectories. It ought to
+accommodate rule-based matching, LLM-based judgment, and other
+heterogeneous methods within a unified explanatory model, serving as
+the foundational requirement for defense abstraction. \emph{ii)
+  Unified interface.} Diverse defenses should be uniformly represented
+with standardized attribute specifications. \emph{iii) Readability and
+  portability.} Defenses should be human-readable and convenient for
+human experts to review and revise, while remaining file-system
+portable for practical distribution.
+
+Guided by these design requirements, we formalize each unit of
+defensive knowledge as a specialized artifact termed a \textit{defense
+  skill}. Distinct from conventional definitions of a \emph{skill}, a
+defense skill is instantiated as a self-contained directory containing
+a natural-language specification file along with required metadata
+specifications. Specifically, a defense skill comprises:
+
+\noindent $\bullet$
+A \texttt{README} file that describes the operational details
+  and specification of the defense.
+
+\noindent $\bullet$
+A configuration file (for example, \texttt{config.yaml}) that
+  specifies required metadata of the defense, including the identifier
+  (\texttt{id}) of the defense, the security category (such as
+  injection defense or content filtering), the execution role (for
+  example, detector), the operational tier, optional triggering
+  thresholds, and prompts if the defense relies on LLMs for
+  discrimination.
+\noindent $\bullet$
+Execution scripts that provide executable source code for
+  immediate invocation.
+
+Figure \ref{fig:EntryFormat} demonstrates two examples of how defense
+units are represented in CAITLYN. Given this abstraction, the
+next step is to organize these skills into an efficient and flexible
+defense system.
+
+\subsection{Hierarchical Organization of Defenses}
+\label{sec:runtime}
+
+Given a collection of defense units, we consider how to naturally
+organize them into a unified system that is efficient to maintain,
+minimally disruptive to normal operations, and flexible for
+expansion. To achieve this, we analyze key characteristics of
+industrial agent-oriented attacks, which we summarize in the following
+two observations.
+
+\begin{observation}[Predominance of Benign Traffic]
+In real-world environments, the vast majority of analyzed inputs are benign.
+\end{observation}
+
+\begin{observation}[Complexity of High-Severity Attacks]
+An attack under the threat model may trigger immediately upon
+receiving malicious input. However, completing a sophisticated attack
+typically requires a series of execution or tool invocation chains,
+with more severe attacks typically exhibiting higher trajectory complexity.
+\end{observation}
+
+
+\input{sections/fig-tier1-prompt-v2}
+
+Based on these two observations, relying merely on complex
+detection methods across all inputs typically proves impractical, as the financial
+cost and inference latency become unaffordable. Conversely, deploying
+lightweight solutions with low detection accuracy is equally
+unsuitable, as high false-positive rates severely impair normal
+task execution.
+
+To address these concerns, we design CAITLYN as a dual-system
+framework comprising System I and System II. System I operates as the
+fast subsystem, providing real-time defense without incurring
+excessive financial overhead or disrupting benign workflows. In
+contrast, System II serves as the slow subsystem, performing in-depth
+analysis of emerging attacks that potentially bypass System I.
+We describe both subsystems below, beginning with the detailed design
+of System~I.
+
+We design System~I with a two-tier architecture: a lightweight,
+rule-based fast-response detector (\ie, the Tier~0 Filter) and an
+LLM-based defense system (\ie, the Tier~1 Classifier). We categorize
+existing defenses into these two parts as they are fundamentally
+distinct in both implementation and methodology.
+
+\noindent
+\textbf{Tier~0 Filter.}
+The Tier~0 Filter comprises only rule-based heuristics and executable
+scripts, referred to as special defense skills. Upon initialization,
+CAITLYN automatically preloads these skills into memory, eliminating
+the process restart overhead for each scan. To ensure system
+reliability and prevent broken rules from blocking ordinary traffic,
+any Tier~0 skill that crashes, times out, or returns malformed output
+is treated as a miss.
+During detection, an input text $x$ is first routed to the Tier~0
+Filter. Each skill $s$ returns a label $y_s \in \{\Cat{BENIGN},
+\Cat{SUSPICIOUS}, \Cat{MALICIOUS}\}$ alongside a confidence score $c_s
+\in [0,1]$. A skill $s$ fires if $y_s = \Cat{MALICIOUS}$ and $c_s \geq
+\tau_s$, where $\tau_s$ denotes the threshold for skill $s$. If any
+Tier~0 skill fires, System~I immediately returns $\Cat{MALICIOUS}$ and
+terminates without invoking the LLM. Otherwise, $x$ is forwarded to
+the Tier~1 Classifier.
+
+\noindent
+\textbf{Tier 1 Classifier.}
+Tier 1 provides high-accuracy detection for input texts that bypass
+Tier 0. It incorporates a suite of LLM-based defense methods, with
+each mechanism instantiated as a defense skill containing specialized
+detection prompts and metadata. Most state-of-the-art LLM-based
+defenses are integrated into this tier.
+To minimize inference latency and token overhead, Tier 1 packs active
+defense skills into two parallel API calls, a strategy we term
+\emph{merged-pair execution}.
+
+Structurally, the first call evaluates detector-based skills, while
+the second incorporates remaining skills as reference knowledge. Both
+calls construct an identical prompt prefix containing a shared system
+wrapper and skill blocks, followed by the target text. This design
+serves a dual purpose: first, keeping the prefix byte-identical across
+requests enables provider-side prompt caching to eliminate repetitive
+input costs; second, restricting model responses to a concise status
+code and confidence score minimizes output generation latency. The
+final decision is reached by applying an OR aggregation over the
+verdicts from both calls.
+Figure~\ref{fig:Tier1Prompt} illustrates
+this pipeline.
+
+
+% \input{sections/alg-1}
+
+While System~I comprehensively leverages existing defenses for
+injection detection in an efficient and effective manner, a
+significant challenge is that System I might not cover all existing
+attacks, meanwhile, attack techniques can even continuously evolve,
+giving rise to novel threats. Consequently, many emerging attacks may
+remain unknown and uncovered by the CAITLYN framework's current
+defense library.
+Therefore, it is necessary to introduce a new component that
+dynamically adapts defenses in response to changing attack patterns
+while seeking out potential new attack signals. Unlike System~I, this
+component does not require real-time operation; it can function
+offline until newly synthesized defense skills are finalized and
+integrated into System~I.
+We detail its synthesis mechanism in the following subsection.
+
+\subsection{Evolution of Defenses: Counterexample-Guided Skill Synthesis}
+\label{sec:synthesis}
+
+Our System~II design is inspired by
+CEGIS~\cite{sketch2006,sygus2013,flashfill2011}, a foundational
+framework for program synthesis. The underlying rationale is that any
+adversarial payload bypassing the current defenses serves as a
+concrete \emph{counterexample}, which in turn acts as a formal
+\emph{specification} for synthesizing more robust defense skills.
+The goal of System~II is to monitor anomalous signals, gather
+potentially malicious content, and automatically synthesize new
+defense skills extending the existing defense library.
+
+System~II begins by collecting and constructing
+\emph{counterexamples}, which represent instances of unknown attacks
+along with their associated injection evidence. Ideally, the injected
+or poisoned \emph{payload} serves as the primary candidate for a
+counterexample. However, extracting raw payloads directly in
+real-world environments is often challenging. Consequently, CAITLYN
+resorts to monitoring abnormal behavioral signals across the agent and
+the underlying host OS as initial evidence, subsequently prompting a
+specialized agent to backward-mine the precise attack payloads. These
+signals specifically encompass: (i) agent tool-calling patterns (e.g.,
+payload size and call frequency); (ii) filesystem write events within
+monitored agent directories; and (iii) host-level OS network
+connection metrics. Besides, users can directly submit candidate
+payload content for CAITLYN to analyze.
+
+Given the counterexamples, System~II is prompted to explore potential
+pathways for interchanging or combining existing defense skills to
+address the new threat. Specifically, the prompt incorporates
+statistical characteristics of the attack (e.g., keywords, entropy,
+length), a cluster of nearest attack samples retrieved from the
+existing attack corpus by token Jaccard overlap, and other necessary
+contextual information. That cluster is shown only to the generator
+and is not used as a hard verification constraint. Guided by this prompt,
+System~II iteratively identifies which features from existing defense
+skills can be adapted to detect the attack, which is a process we term
+the \emph{generator}. To critique and guide the generator, we
+integrate three external resources: (i) a \emph{verification sandbox},
+which provides an isolated static environment to immediately evaluate
+newly proposed defense scripts; (ii) an independent \emph{reviewer},
+acting as a separate LLM agent to evaluate the correctness of the
+derived defense skills and offer constructive feedback; and (iii) a
+\emph{lesson database}, which archives all prior successful and failed
+attempts to inform future iterations.
+
+Building on these components, the overall agentic loop functions as
+follows: given predefined limits on maximum iteration rounds, token
+budgets, and acceptance criteria, the generator iteratively refines
+and optimizes the defense skills.
+Further discussions for System II, such as the
+overfitting of defense synthesis or the pruning of overly broad
+predicates, are provided in Appendix~\ref{app:synthesis-overfit}.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/detection_roc_pr.pdf}
+  \caption{
+    Detection-only experiments across the four datasets.
+    Every detector uses the same ranking score:
+    the predicted-class confidence when the detector fires as attack-like,
+    and 0 otherwise. Operating points at the default thresholds
+    are marked in the ROC panels with one marker shape per detector,
+    and the operating point of CAITLYN is highlighted in the PR panels.
+  }
+  \label{fig:detection-roc-pr}
+\end{figure*}
+
+\subsection{Engineering Details}
+\label{sec:deployment}
+
+To complement our core architecture, this subsection details key
+engineering considerations for deploying CAITLYN in
+production LLM agent environments.
+
+\noindent
+\textbf{Agentic Middleware.}
+CAITLYN is engineered as a lightweight, agent-agnostic middleware to
+enable seamless integration with prevailing agent frameworks. For
+flexible management, it provides a Terminal User Interface (TUI)
+supporting both CLI and natural-language commands, which is
+particularly advantageous when monitoring multiple agents on a single
+host. At the system level, CAITLYN operates as a background \emph{daemon}
+that continuously intercepts unsafe observations by combining agent
+execution hooks, filesystem watchers, and OS-level telemetry.
+
+\noindent
+\textbf{Cloud Synchronization.}
+CAITLYN maintains centralized cloud repositories to aggregate and
+synchronize attack signatures and defense skills across deployed
+instances. To safeguard user privacy, this feature is strictly
+disabled by default. Upon explicit user opt-in, emerging attack
+samples and synthesized defense skills are transmitted to the cloud,
+where they undergo rigorous human auditing and curation by security
+experts before being synchronized across deployments or integrated
+into base updates.
+
+\noindent
+\textbf{Operational Guardrails.}
+CAITLYN enforces several system-level guardrails to ensure
+availability and cost efficiency. To preserve agent responsiveness,
+interception hooks default to a fail-open policy upon errors or
+timeouts. Large inputs are capped at 1~MiB using a head-and-tail
+truncation scheme to capture injection payloads at document
+boundaries. Noise-heavy tool channels are filtered via
+skip-lists, while detected malicious files are automatically
+quarantined. Defense synthesis is rate-limited via
+configurable thresholds, set by default to a 60-minute cooldown and a
+daily cap of 10 runs, preventing adversarial payload surges from
+exploiting the evolutionary pipeline into a resource or financial cost
+amplifier.
+

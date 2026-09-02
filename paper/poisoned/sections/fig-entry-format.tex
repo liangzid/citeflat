@@ -1,0 +1,172 @@
+% Skill representation (Section 3.1, Figure~\ref{fig:EntryFormat}).
+% Left: Tier-0 folder with detect.ts (injection-general).
+% Right: Tier-1 folder with prompt in config.yaml.
+% Long lists and prompts are elided with ...
+% REVIEW(团长): ink-on-parchment rendering aligned with emerging case study.
+
+\lstdefinestyle{skillfile}{
+  basicstyle=\ttfamily\scriptsize,
+  frame=none,
+  numbers=none,
+  aboveskip=0pt,
+  belowskip=0pt,
+  xleftmargin=0pt,
+  columns=fullflexible,
+  breaklines=true,
+  showstringspaces=false,
+  keepspaces=true
+}
+\tcbset{
+  f1outer/.style={
+    enhanced,
+    arc=1.6pt,
+    boxrule=0.75pt,
+    left=5pt, right=5pt, top=4pt, bottom=2pt,
+    valign=top,
+    fontupper=\sffamily\scriptsize,
+    lefttitle=6pt, righttitle=6pt,
+    toptitle=2pt, bottomtitle=2pt,
+    titlerule=0.55pt,
+    fonttitle=\sffamily\scriptsize\bfseries,
+    before skip=0pt, after skip=0pt,
+  },
+  f1card/.style={
+    enhanced,
+    arc=1.2pt,
+    boxrule=0.5pt,
+    left=3.5pt, right=3.5pt, top=1.5pt, bottom=1.5pt,
+    boxsep=1pt,
+    toptitle=0.5pt, bottomtitle=0.5pt, lefttitle=3.5pt,
+    titlerule=0.4pt,
+    fonttitle=\ttfamily\scriptsize\bfseries,
+    colback=white,
+    before skip=3pt, after skip=0pt,
+    valign=top,
+  },
+}
+
+\begin{figure*}[!ht]
+\centering
+\begin{minipage}{0.96\textwidth}
+\centering
+{\sffamily\scriptsize\color{FigMute}
+Left: executable script. Right: prompt template. Elided text is marked \texttt{...}.}
+\vspace{2.5pt}
+
+\begin{minipage}[t]{0.475\textwidth}
+\begin{tcolorbox}[
+  f1outer, equal height group=f1outer,
+  colframe=HoldInk, colback=HoldFill,
+  coltitle=HoldInk, colbacktitle=HoldFill,
+  titlerule style=HoldInk,
+  title={Tier-0 Defense \hfill\texttt{injection-general/}},
+]
+{\ttfamily\scriptsize
+\begin{tabular}{@{}ll@{}}
+\multicolumn{2}{@{}l}{\textcolor{HoldInk}{\textbf{injection-general/}}} \\
+\ \ config.yaml  & \textcolor{FigMute}{\sffamily Contract} \\
+\ \ detect.ts    & \textcolor{HoldInk}{\sffamily Executable} \\
+\ \ detect.mjs   & \textcolor{FigMute}{\sffamily Worker Entry} \\
+\end{tabular}}
+\vspace{3pt}
+\begin{tcolorbox}[
+  f1card, equal height group=f1cfg,
+  colframe=HoldInk, coltitle=HoldInk,
+  colbacktitle=white, titlerule style=HoldInk!35,
+  borderline west={2.0pt}{0pt}{HoldInk},
+  title={\texttt{config.yaml}},
+]
+\begin{lstlisting}[style=skillfile]
+id: injection-general
+tier: 0
+role: detector
+threshold: 0.6
+signatures:
+  - pattern: "ignore previous instructions"
+    label: ignore-previous
+  ...
+\end{lstlisting}
+\end{tcolorbox}
+\begin{tcolorbox}[
+  f1card, equal height group=f1exe,
+  colframe=HoldInk, coltitle=HoldInk,
+  colbacktitle=white, titlerule style=HoldInk!35,
+  borderline west={2.0pt}{0pt}{HoldInk},
+  title={\texttt{detect.ts} \hfill Executable},
+]
+\begin{lstlisting}[style=skillfile]
+export function detect(content) {
+  for (const sig of signatures) {
+    if (sig.pattern.test(content)) ...
+  }
+  ...
+  return { verdict, confidence, reason };
+}
+\end{lstlisting}
+\end{tcolorbox}
+\end{tcolorbox}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.475\textwidth}
+\begin{tcolorbox}[
+  f1outer, equal height group=f1outer,
+  colframe=RecInk, colback=RecFill,
+  coltitle=RecInk, colbacktitle=RecFill,
+  titlerule style=RecInk,
+  title={Tier-1 Defense \hfill\texttt{instruction-hierarchy/}},
+]
+{\ttfamily\scriptsize
+\begin{tabular}{@{}ll@{}}
+\multicolumn{2}{@{}l}{\textcolor{RecInk}{\textbf{instruction-hierarchy/}}} \\
+\ \ config.yaml  & \textcolor{RecInk}{\sffamily Contract $+$ Prompt} \\
+\ \ detect.ts    & \textcolor{FigMute}{\sffamily (none)} \\
+\ \ detect.mjs   & \textcolor{FigMute}{\sffamily (none)} \\
+\end{tabular}}
+\vspace{3pt}
+\begin{tcolorbox}[
+  f1card, equal height group=f1cfg,
+  colframe=RecInk, coltitle=RecInk,
+  colbacktitle=white, titlerule style=RecInk!35,
+  borderline west={2.0pt}{0pt}{RecInk},
+  title={\texttt{config.yaml}},
+]
+\begin{lstlisting}[style=skillfile]
+id: instruction-hierarchy
+tier: 1
+role: detector
+threshold: 0.7
+prompt: |
+  SYSTEM > TOOL > USER > EXTERNAL.
+  1. Impersonation ...
+  ...
+\end{lstlisting}
+\end{tcolorbox}
+\begin{tcolorbox}[
+  f1card, equal height group=f1exe,
+  colframe=RecInk, coltitle=RecInk,
+  colbacktitle=white, titlerule style=RecInk!35,
+  borderline west={2.0pt}{0pt}{RecInk},
+  title={\texttt{prompt} \hfill LLM Contract},
+]
+\begin{lstlisting}[style=skillfile]
+The hierarchy is, highest first:
+  SYSTEM > TOOL > USER > EXTERNAL.
+Output EXACTLY one line:
+  "benign n", "suspicious n",
+  or "malicious n".
+Do not output anything else.
+...
+\end{lstlisting}
+\end{tcolorbox}
+\end{tcolorbox}
+\end{minipage}
+
+\end{minipage}
+
+\caption{The skill representation. Both panels are defense skills stored as
+  directories. The Tier-0 skill (left) pairs a YAML contract with an executable
+  script that returns one JSON verdict. The Tier-1 skill
+  (right) stores detection logic as a prompt template in the same YAML
+  contract. The runtime dispatches on the \texttt{tier} field, so synthesis can
+  rewrite either contract without changing the folder interface.}
+\label{fig:EntryFormat}
+\end{figure*}

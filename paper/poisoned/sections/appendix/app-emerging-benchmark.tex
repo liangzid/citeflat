@@ -1,0 +1,41 @@
+\subsection{Emerging Benchmark Statistics and Full Results}
+\label{app:emerging-benchmark-details}
+
+\input{sections/appendix/fig-emerging-stats}
+\input{sections/appendix/tables/table-emerging-full}
+\input{sections/appendix/tables/table-emerging-perfamily}
+
+The Emerging benchmark is constructed from 200 attack cases, each of which
+records the user task, the tool that delivers the untrusted content, the
+injected content itself, the attacker target, and the expected compromised
+behavior.
+Figure~\ref{fig:appendix-emerging-stats} reports the composition of the
+benchmark, the nine attack families in construction order, and the ten
+generation templates.
+Every case has a distinct attacker target, which prevents a signature that
+memorizes a single target string from inflating the results.
+Table~\ref{tab:appendix-emerging-full} is the numeric companion of
+Figure~\ref{fig:EmergingBenchmarkResults}.
+All static defenses, including the initial System~I library, sit between
+72.5\% and 80.0\% ASR on every agent, while the evolved library reduces ASR
+to 38.5\% on OpenClaw and 39.5\% on Codex and Hermes.
+Table~\ref{tab:appendix-emerging-perfamily} breaks the same runs down by
+family.
+The static range column shows that no single static baseline is responsible
+for the failure: on most families every baseline is compromised in nearly
+every case.
+The family-level view also makes the coverage profile of the evolved
+library explicit.
+The gain is concentrated in Status Field and Policy Delta, which drop
+to 0.0\% ASR on all three agents, and in Search Mirror, which drops to
+0.0\% on OpenClaw and Codex and to 4\% on Hermes.
+The Freshness Framing, Latest Event, Directory Alias, and Ledger Update
+families remain partially or fully compromised because the four retained
+end-to-end skills were synthesized from pipe-to-shell seed failures rather
+than from those families.
+On Hermes, Ledger Update ASR rises from 88\% under the initial library
+to 100\% after evolution.
+These four skills are not the four active skills of the sequential
+stream in Section~\ref{sec:LifelongSynthesis}. That study is a separate
+detection-only protocol whose per-wave detail appears in
+Table~\ref{tab:appendix-lifelong-waves}.

@@ -1,0 +1,31 @@
+\begin{table}[t]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3.5pt}
+  \renewcommand{\arraystretch}{1.18}
+  \caption[Per-wave detail of Sequential synthesis on the nine-family Emerging stream, after the over-broad filter.]{%
+    Per-wave detail of Sequential synthesis on the nine-family
+    Emerging stream, after the over-broad filter.
+    % TPR is held-out TPR on the current family after the filter.
+    % Tokens count the generator budget spent by System~II in that wave.
+    % Rows with Accept termination increased the active skill count.
+    % One Accept may admit more than one skill, as in wave~8.
+  }
+  \label{tab:appendix-lifelong-waves}
+  \rowcolors{2}{BoxGray!30}{white}
+  \begin{tabular}{@{}clrrrlr@{}}
+    \toprule
+    \textbf{Wave} & \textbf{Family} & \textbf{Held} & \textbf{TPR} & \textbf{Tokens} & \textbf{Termination} & \textbf{Skills} \\
+    \midrule
+    1 & Status Field        & 12 & 25.0  & 4064  & Generation Failed & 0 \\
+    2 & Freshness Framing   & 13 & 0.0   & 21397 & Max Rounds        & 0 \\
+    3 & Policy Delta        & 13 & 7.7   & 2669  & Accept            & 1 \\
+    4 & Search Mirror       & 13 & 0.0   & 20299 & Max Rounds        & 1 \\
+    5 & Latest Event        & 12 & 8.3   & 22209 & Max Rounds        & 1 \\
+    6 & Directory Alias     & 13 & 15.4  & 22520 & Max Rounds        & 1 \\
+    7 & Ledger Update       & 4  & 100.0 & 3380  & Accept            & 2 \\
+    8 & Mail Followup       & 10 & 100.0 & 8394  & Accept            & 4 \\
+    9 & Operational Command & 10 & 90.0  & 0     & Skipped           & 4 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

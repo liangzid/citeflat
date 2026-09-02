@@ -1,0 +1,48 @@
+% CLI status session (Appendix D.2). White terminal card.
+\begin{figure}[t]
+  \centering
+  \resizebox{0.96\columnwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\ttfamily\scriptsize,
+    term/.style={
+      rounded corners=2.4pt,
+      line width=0.75pt,
+      draw=HoldInk,
+      fill=white,
+      inner xsep=6pt,
+      inner ysep=4.5pt,
+      align=left,
+      font=\ttfamily\scriptsize,
+      text width=\dimexpr\columnwidth-22pt\relax,
+    },
+  ]
+    \node[term] (box) {%
+      {\color{FigMute}\$}\ {\color{FigInk}\textbf{caitlyn status}}\\[3pt]
+      {\color{FigInk}CAITLYN: 24 antibodies (24 roots), 6 antigens}\\[2pt]
+      {\color{FigMute}adversarial-suffix}\quad{\color{FigMute}[jailbreak]}\ {\color{HoldInk}T0}\\
+      {\color{FigMute}classifier-injection}\quad{\color{FigMute}[injection]}\ {\color{HoldInk}T1}\\
+      {\color{FigMute}delimiter-sandwich}\quad{\color{FigMute}[injection]}\ {\color{HoldInk}T0}\\
+      {\color{FigMute}exfiltration}\quad{\color{FigMute}[exfiltration]}\ {\color{HoldInk}T0}\\
+      {\color{FigMute}injection-general}\quad{\color{FigMute}[injection]}\ {\color{HoldInk}T0}\\
+      {\color{FigMute}instruction-hierarchy}\quad{\color{FigMute}[injection]}\ {\color{HoldInk}T1}\\
+      {\color{FigMute}jailbreak-general}\quad{\color{FigMute}[jailbreak]}\ {\color{HoldInk}T0}\\
+      {\color{FigMute}poisoning-general}\quad{\color{FigMute}[poisoning]}\ {\color{HoldInk}T0}\\
+      {\color{FigMute}tool-firewall}\quad{\color{FigMute}[tool\_misuse]}\ {\color{HoldInk}T1}\\
+      {\color{FigMute}...}\\[2pt]
+      {\color{FigMute}antigens:}\ {\color{FigInk}jailbreak 2 · injection 3 · poisoning 1}%
+    };
+    \node[
+      font=\sffamily\scriptsize\bfseries,
+      text=HoldInk,
+      anchor=south west,
+    ] at ([yshift=4pt]box.north west) {CLI · status};
+  \end{tikzpicture}%
+  }
+  \caption[Library inventory from the CAITLYN CLI.]{%
+    Library inventory from the CAITLYN CLI.
+    The listing is truncated with \texttt{...}.
+    Counts reflect a development workstation after the evaluation campaigns
+    in Section~\ref{sec:evaluation}.
+  }
+  \label{fig:appendix-cli-status}
+\end{figure}

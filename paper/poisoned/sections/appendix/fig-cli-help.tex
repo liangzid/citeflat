@@ -1,0 +1,49 @@
+% CLI help session (Appendix D.2). White terminal card, HoldInk stroke.
+% Ink language matches EntryFormat / repository guards, fill forced white.
+\begin{figure}[t]
+  \centering
+  \resizebox{0.96\columnwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\ttfamily\scriptsize,
+    term/.style={
+      rounded corners=2.4pt,
+      line width=0.75pt,
+      draw=HoldInk,
+      fill=white,
+      inner xsep=6pt,
+      inner ysep=4.5pt,
+      align=left,
+      font=\ttfamily\scriptsize,
+      text width=\dimexpr\columnwidth-22pt\relax,
+    },
+  ]
+    \node[term] (box) {%
+      {\color{FigMute}\$}\ {\color{FigInk}\textbf{caitlyn help}}\\[3pt]
+      {\color{FigInk}CAITLYN: Continuous Agents for Injection Threats}\\[1pt]
+      {\color{FigMute}via Lifelong Yielding Nexus}\\[4pt]
+      {\color{FigMute}Usage:}\ {\color{FigInk}caitlyn <command> [options]}\\[3pt]
+      {\color{HoldInk}\textbf{Commands:}}\\[2pt]
+      {\color{FigInk}tui}\hfill{\color{FigMute}full-screen terminal UI}\\
+      {\color{FigInk}scan <content>}\hfill{\color{FigMute}single-shot security scan}\\
+      {\color{FigInk}status}\hfill{\color{FigMute}antibody and antigen library}\\
+      {\color{FigInk}dashboard}\hfill{\color{FigMute}defense statistics}\\
+      {\color{FigInk}history [N]}\hfill{\color{FigMute}recent scan history}\\
+      {\color{FigInk}detect}\hfill{\color{FigMute}discover supported agents}\\
+      {\color{FigInk}install <agent>}\hfill{\color{FigMute}inject host hooks}\\
+      {\color{FigInk}vaccinate <pattern>}\hfill{\color{FigMute}submit immune response}\\
+      {\color{FigInk}help}\hfill{\color{FigMute}show this help}%
+    };
+    \node[
+      font=\sffamily\scriptsize\bfseries,
+      text=HoldInk,
+      anchor=south west,
+    ] at ([yshift=4pt]box.north west) {CLI · help};
+  \end{tikzpicture}%
+  }
+  \caption[Command surface of the CAITLYN CLI.]{%
+    Command surface of the CAITLYN CLI.
+    The default entry point without a subcommand launches the terminal
+    user interface.
+  }
+  \label{fig:appendix-cli-help}
+\end{figure}

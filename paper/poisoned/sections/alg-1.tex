@@ -1,0 +1,92 @@
+
+Algorithm~\ref{alg:ScanPipeline} states the above pipeline.
+
+% System I scanning pipeline (Section 3.2).
+% Included from sections/methodology.tex.
+
+\definecolor{AlgoComment}{RGB}{0,90,255}
+\algrenewcommand{\algorithmiccomment}[1]{%
+  \hfill\textcolor{AlgoComment}{\footnotesize\textit{// #1}}%
+}
+\algnewcommand{\PhaseComment}[1]{%
+  \Statex \textcolor{AlgoComment}{\footnotesize\textit{// #1}}%
+}
+\algtext*{EndIf}
+\algtext*{EndFor}
+
+\begin{algorithm}[!ht]
+\caption{System~I scanning pipeline}
+\label{alg:ScanPipeline}
+\small
+\begin{algorithmic}[1]
+\Require content $x$, library $\mathcal{S}=\mathcal{S}_0\cup\mathcal{S}_1$
+\Ensure label $y$, confidence $c$, tier $k\in\{0,1\}$
+\PhaseComment{Tier 0: resident signature matching}
+\ForAll{$s \in \mathcal{S}_0$}
+  \State $(y_s, c_s) \gets s(x)$
+  \Comment{timeout, fail-open}
+\EndFor
+\State $\mathcal{R}_0 \gets \{(y_s, c_s)\}_{s\in\mathcal{S}_0}$
+\State $\mathcal{F}_0 \gets \{ s \in \mathcal{S}_0 \mid y_s = \Cat{MALICIOUS},\ c_s \geq \tau_s \}$
+\If{$\mathcal{F}_0 \neq \varnothing$}
+  \State \Return $(\Cat{MALICIOUS},\ \max_{s\in\mathcal{F}_0} c_s,\ 0)$
+  \Comment{hard block}
+\EndIf
+\PhaseComment{Deterministic escalation gate}
+\State $m \gets \mathrm{Escalate}(\mathcal{R}_0)$
+\Comment{no LLM call}
+\If{$m = \Cat{NONE}$}
+  \State \Return $(\Cat{BENIGN},\ 0,\ 0)$
+  \Comment{skip Tier 1}
+\EndIf
+\If{$m = \Cat{FAST}$}
+  \State $\mathcal{S}' \gets \mathrm{FastSubset}(\mathcal{S}_1)$
+  \Comment{capped subset}
+\Else
+  \State $\mathcal{S}' \gets \mathcal{S}_1$
+  \Comment{full ensemble}
+\EndIf
+\PhaseComment{Tier 1: single-token evaluators}
+\ForAll{$s \in \mathcal{S}'$}
+  \State $(y_s, c_s) \gets s(x)$
+  \Comment{parallel, timeout}
+\EndFor
+\State $\mathcal{F}_1 \gets \{ s \in \mathcal{S}' \mid y_s = \Cat{MALICIOUS},\ c_s \geq \tau_s \}$
+\If{$\mathcal{F}_1 \neq \varnothing$}
+  \State \Return $(\Cat{MALICIOUS},\ \max_{s\in\mathcal{F}_1} c_s,\ 1)$
+\EndIf
+\State $\mathcal{U} \gets \{ s \in \mathcal{S}' \mid y_s = \Cat{SUSPICIOUS} \}$
+\If{$m = \Cat{FAST}$ \textbf{and} $\mathcal{U} \neq \varnothing$}
+  \State $\mathcal{S}'' \gets \mathcal{S}_1 \setminus \mathcal{S}'$
+  \Comment{remaining skills}
+  \State \textbf{for all} $s \in \mathcal{S}''$ \textbf{do} $(y_s, c_s) \gets s(x)$
+  \State $\mathcal{S}' \gets \mathcal{S}' \cup \mathcal{S}''$
+  \State $\mathcal{F}_1 \gets \{ s \in \mathcal{S}' \mid y_s = \Cat{MALICIOUS},\ c_s \geq \tau_s \}$
+  \If{$\mathcal{F}_1 \neq \varnothing$}
+    \State \Return $(\Cat{MALICIOUS},\ \max_{s\in\mathcal{F}_1} c_s,\ 1)$
+  \EndIf
+  \State $\mathcal{U} \gets \{ s \in \mathcal{S}' \mid y_s = \Cat{SUSPICIOUS} \}$
+\EndIf
+\If{$\mathcal{U} \neq \varnothing$}
+  \State \Return $(\Cat{SUSPICIOUS},\ \max_{s\in\mathcal{U}} c_s,\ 1)$
+\EndIf
+\State \Return $(\Cat{BENIGN},\ 0,\ 1)$
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: "../main"
+%%% End:

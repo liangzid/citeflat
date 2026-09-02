@@ -1,0 +1,139 @@
+\begin{table*}[t]
+  \centering
+  \scriptsize
+  \renewcommand{\arraystretch}{1.12}
+  \caption[The shipped defense skill library of CAITLYN.]{%
+    The shipped defense skill library of CAITLYN.
+    Every skill is a self-contained directory with a YAML contract and,
+    for Tier~0, an executable detector script.
+    Tier~0 and Tier~1 skills run inside System~I.
+    Entries tagged tier 2 also run inside System~I: they are packed
+    only as knowledge-scope context, not as a separate runtime system.
+    The tier field determines whether the runtime dispatches the
+    signature engine or the merged-pair evaluator.
+  }
+  \label{tab:appendix-skill-inventory}
+  % Column widths sum to \textwidth minus 10\tabcolsep. Long skill IDs
+  % wrap at explicit hyphens via \allowbreak. Do not let this table*
+  % exceed the 7in USENIX text block.
+  \setlength{\tabcolsep}{3pt}
+  \resizebox{\textwidth}{!}{%
+  \rowcolors{2}{BoxGray!30}{white}
+  \begin{tabular}{@{}
+    >{\ttfamily\bfseries\raggedright\arraybackslash\hspace{0pt}}p{2.70cm}
+    >{\raggedright\arraybackslash}p{3.20cm}
+    >{\centering\arraybackslash}p{0.65cm}
+    >{\centering\arraybackslash}p{1.80cm}
+    >{\centering\arraybackslash}p{1.75cm}
+    >{\raggedright\arraybackslash}p{6.55cm}
+    @{}}
+    \toprule
+    \multicolumn{1}{@{}l}{\textbf{Skill}} &
+    \multicolumn{1}{l}{\textbf{Name}} &
+    \multicolumn{1}{c}{\textbf{Tier}} &
+    \multicolumn{1}{c}{\textbf{Role}} &
+    \multicolumn{1}{c}{\textbf{Category}} &
+    \multicolumn{1}{l@{}}{\textbf{Detection target}} \\
+    \midrule
+    adversarial-\allowbreak suffix
+      & Adversarial Suffix and Compliant Prefill Detector
+      & 0 & Detector & Jailbreak
+      & GCG-style suffixes, format corruption, and compliant-prefill jailbreaks \\
+    delimiter-\allowbreak sandwich
+      & Delimiter Sandwich Preprocessor
+      & 0 & Non Detector & Injection
+      & XML and JSON delimiter wrap with breakout checks \\
+    entropy-\allowbreak anomaly
+      & Entropy and Statistical Anomaly Detector
+      & 0 & Detector & Unknown
+      & Character-distribution and token-repetition anomalies \\
+    exfiltration
+      & Exfiltration Detector
+      & 0 & Detector & Exfiltration
+      & Credential, system-prompt, and conversation exfiltration \\
+    hardened-\allowbreak prompt
+      & Hardened System Prompt Preprocessor
+      & 0 & Non Detector & Injection
+      & Override-resistant system prompt construction \\
+    injection-\allowbreak general
+      & General Injection Detector
+      & 0 & Detector & Injection
+      & Fast regex and heuristic injection signatures \\
+    instruction-\allowbreak redirection
+      & Instruction and Goal Redirection Detector
+      & 0 & Detector & Injection
+      & Multilingual ignore-previous payloads and format markers \\
+    jailbreak-\allowbreak general
+      & General Jailbreak Detector
+      & 0 & Detector & Jailbreak
+      & Fast regex and heuristic jailbreak signatures \\
+    obfuscation-\allowbreak detector
+      & Obfuscation and Encoding Detector
+      & 0 & Detector & Injection
+      & Homoglyphs, leetspeak, spaced letters, and encoding escapes \\
+    output-\allowbreak secrets-\allowbreak guard
+      & Output Secrets Guard
+      & 0 & Detector & Exfiltration
+      & PEM keys, API keys, JWTs, and credential pairs \\
+    pattern-\allowbreak injection
+      & Pattern-Based Injection Signature Detector
+      & 0 & Detector & Injection
+      & Known patterns from Prompt Guard, PINT, and Rebuff \\
+    persona-\allowbreak hijack
+      & Persona Hijack Detector
+      & 0 & Detector & Jailbreak
+      & Role-play personas such as DAN, STAN, and EVIL-GPT \\
+    poisoning-\allowbreak general
+      & General Poisoning Detector
+      & 0 & Detector & Poisoning
+      & Tool-output and MCP response poisoning \\
+    retrieval-\allowbreak hijack
+      & Retrieval Hijack and Authority Spoof Detector
+      & 0 & Detector & Poisoning
+      & RAG, authority spoofing, and supply-chain manifests \\
+    \midrule
+    classifier-\allowbreak injection
+      & LLM Classifier for Prompt Injection
+      & 1 & Detector & Injection
+      & Context-boundary-aware injection classification \\
+    escalation-\allowbreak coordinator
+      & Cost-Triggered Escalation Coordinator
+      & 1 & Non Detector & Unknown
+      & Cost- and risk-driven escalation to deeper scanning \\
+    execution-\allowbreak tracer
+      & Execution Tracer
+      & 1 & Non Detector & Tool Misuse
+      & Tool-call and reasoning anomalies via lifecycle monitoring \\
+    instruction-\allowbreak hierarchy
+      & Instruction Hierarchy Guard
+      & 1 & Detector & Injection
+      & Instruction-priority boundary violations \\
+    paraphrase-\allowbreak sanitizer
+      & Paraphrase Sanitizer
+      & 1 & Non Detector & Injection
+      & Paraphrase or backtranslation before classification \\
+    permission-\allowbreak gating
+      & Permission Gating Guard
+      & 1 & Non Detector & Tool Misuse
+      & Tool-call policy checks before execution \\
+    spotlighting
+      & Spotlighting Data Marker
+      & 1 & Non Detector & Injection
+      & Random delimiters that mark untrusted content as data \\
+    tool-\allowbreak firewall
+      & Tool-Interface Firewall
+      & 1 & Non Detector & Tool Misuse
+      & Input minimization and output sanitization at the tool boundary \\
+    \midrule
+    re-\allowbreak execution-\allowbreak verifier
+      & Re-Execution Verifier
+      & 2 & Non Detector & Poisoning
+      & Masked re-execution trajectory verification \\
+    self-\allowbreak examination
+      & Self-Examination Guard
+      & 2 & Non Detector & Injection
+      & Self-inspection of defense reasoning for influence \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table*}
