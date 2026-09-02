@@ -1,0 +1,31 @@
+\subsection{Defense Repository Security Analysis}
+\label{app:repository-risks}
+
+
+The trusted computing base of CAITLYN includes the defense
+repository, so an adversary who can tamper with the repository could
+disable detection or install attacker-chosen rules.
+This appendix analyzes the update path of the repository and the defenses
+that keep it inside the trust boundary.
+
+The local repository is written only by System~II and by an authenticated
+operator.
+System~II never exposes the raw trigger text to the generator, never
+activates a candidate that failed deterministic verification, and never
+promotes a shadow candidate without a clean observation window or explicit
+approval.
+The optional cloud-synchronization channel is off by default.
+When enabled, a participating node can upload attack samples and
+hand-written defense skills, but remote skills never auto-activate and
+every contribution passes a human audit before cross-deployment release.
+The channel is therefore a curated contribution pipeline rather than a
+write channel into another host's repository.
+
+Figure~\ref{fig:appendix-repository-guards} summarizes the six poisoning
+defenses implemented on the local update path.
+The residual risk is social and operational: a plausible-looking poisoned
+contribution must still pass expert review, and an attacker who compromises
+the operator's authentication can bypass the entire pipeline.
+The adversarial model of Section~\ref{sec:AdaptiveAttacks} excludes both
+paths by assumption, so an end-to-end poisoning campaign against the
+curation pipeline remains an open research direction.

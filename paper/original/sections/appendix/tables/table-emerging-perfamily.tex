@@ -1,0 +1,83 @@
+\begin{table*}[tp!]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3pt}
+  \renewcommand{\arraystretch}{1.10}
+  \caption[Per-family ASR on Emerging for each agent.]{%
+    Per-family ASR on Emerging for each agent.
+    \emph{Static} reports the range over the six static defenses
+    (Regex-Guard, LLM-Judge, LLM-Judge+Fewshot, Spotlighting+Delimiting,
+    Tool Filter, and PI Detector).
+    \emph{None} is the undefended column.
+    \emph{S-I} is the initial System~I library of CAITLYN, and
+    \emph{S-II} is the System~I library after System~II synthesis with
+    the over-broad filter.
+  }
+  \label{tab:appendix-emerging-perfamily}
+  \begin{minipage}[t]{0.315\textwidth}
+    \centering
+    {\footnotesize\bfseries OpenClaw}\\
+    {\scriptsize\itshape family-level attack success rate (\%)}\\
+    \medskip
+    \rowcolors{2}{BoxGray!30}{white}
+    \begin{tabular}[t]{@{}lrrrrr@{}}
+      \toprule
+      \textbf{Family} & \textbf{$n$} & \textbf{None} & \textbf{Static} & \textbf{S-I} & \textbf{S-II} \\
+      \midrule
+      Status & 25 & 96 & 83$-$100 & 96 & 0 \\
+      Freshness & 27 & 96 & 83$-$100 & 100 & 93 \\
+      Policy & 25 & 100 & 100$-$100 & 96 & 0 \\
+      Mirror & 25 & 100 & 83$-$100 & 100 & 0 \\
+      Event & 24 & 88 & 50$-$100 & 83 & 83 \\
+      Alias & 26 & 96 & 50$-$100 & 100 & 92 \\
+      Ledger & 8 & 88 & 83$-$100 & 100 & 100 \\
+      Mail & 20 & 0 & 0$-$0 & 0 & 0 \\
+      Ops & 20 & 0 & 0$-$0 & 0 & 0 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.315\textwidth}
+    \centering
+    {\footnotesize\bfseries Codex}\\
+    {\scriptsize\itshape family-level attack success rate (\%)}\\
+    \medskip
+    \rowcolors{2}{BoxGray!30}{white}
+    \begin{tabular}[t]{@{}lrrrrr@{}}
+      \toprule
+      \textbf{Family} & \textbf{$n$} & \textbf{None} & \textbf{Static} & \textbf{S-I} & \textbf{S-II} \\
+      \midrule
+      Status & 25 & 96 & 100$-$100 & 100 & 0 \\
+      Freshness & 27 & 93 & 83$-$100 & 96 & 89 \\
+      Policy & 25 & 100 & 83$-$100 & 100 & 0 \\
+      Mirror & 25 & 92 & 67$-$100 & 100 & 0 \\
+      Event & 24 & 92 & 83$-$100 & 100 & 100 \\
+      Alias & 26 & 96 & 83$-$100 & 100 & 92 \\
+      Ledger & 8 & 100 & 83$-$100 & 100 & 88 \\
+      Mail & 20 & 0 & 0$-$0 & 0 & 0 \\
+      Ops & 20 & 0 & 0$-$0 & 0 & 0 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.315\textwidth}
+    \centering
+    {\footnotesize\bfseries Hermes}\\
+    {\scriptsize\itshape family-level attack success rate (\%)}\\
+    \medskip
+    \rowcolors{2}{BoxGray!30}{white}
+    \begin{tabular}[t]{@{}lrrrrr@{}}
+      \toprule
+      \textbf{Family} & \textbf{$n$} & \textbf{None} & \textbf{Static} & \textbf{S-I} & \textbf{S-II} \\
+      \midrule
+      Status & 25 & 100 & 67$-$100 & 100 & 0 \\
+      Freshness & 27 & 96 & 67$-$100 & 100 & 89 \\
+      Policy & 25 & 100 & 67$-$100 & 96 & 0 \\
+      Mirror & 25 & 100 & 83$-$100 & 100 & 4 \\
+      Event & 24 & 92 & 50$-$100 & 92 & 92 \\
+      Alias & 26 & 96 & 50$-$100 & 96 & 92 \\
+      Ledger & 8 & 100 & 83$-$100 & 88 & 100 \\
+      Mail & 20 & 0 & 0$-$0 & 0 & 0 \\
+      Ops & 20 & 0 & 0$-$0 & 0 & 0 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}
+\end{table*}

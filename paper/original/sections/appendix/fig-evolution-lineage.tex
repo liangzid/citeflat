@@ -1,0 +1,101 @@
+% Single-column evolution lineage (Appendix B.2).
+% No revaccination node. Editorial ink palette.
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}[
+    font=\sffamily\scriptsize,
+    >=Stealth,
+    every node/.style={align=center},
+    card/.style={
+      rounded corners=2.4pt, line width=0.8pt,
+      inner xsep=4.5pt, inner ysep=3.2pt,
+      minimum width=2.15cm, minimum height=0.72cm,
+      font=\sffamily\scriptsize,
+    },
+    seed/.style={
+      card, draw=HoldInk, fill=HoldFill, text=FigInk,
+      minimum width=2.8cm,
+    },
+    pruned/.style={
+      card, draw=Spine, fill=MetaFill, text=FigMute,
+    },
+    keep/.style={
+      card, draw=PassInk, fill=PassFill, text=FigInk,
+    },
+    elink/.style={
+      draw=FigInk!50, line width=0.75pt, line join=round,
+      -{Stealth[length=3.2pt, width=2.8pt]}
+    },
+  ]
+    \node[seed] (seed) at (0,0)
+      {\textbf{Seed Library}\\[-1pt]
+       {\color{FigMute}24 Shipped Skills}};
+
+    \node[pruned] (n15) at (-2.45,-1.55)
+      {\ttbf{ID 015}\\[-1pt]{\color{FigMute}Pruned}};
+    \node[pruned] (n34) at (0,-1.55)
+      {\ttbf{ID 034}\\[-1pt]{\color{FigMute}Pruned}};
+    \node[pruned] (n48) at (2.45,-1.55)
+      {\ttbf{ID 048}\\[-1pt]{\color{FigMute}Pruned}};
+
+    \node[keep] (n44) at (-2.45,-3.15)
+      {\ttbf{ID 044}\\[-1pt]{\color{FigMute}Gen 2}};
+    \node[keep] (n45) at (0,-3.15)
+      {\ttbf{ID 045}\\[-1pt]{\color{FigMute}Gen 4}};
+
+    \node[keep] (n49) at (-1.2,-4.75)
+      {\ttbf{ID 049}\\[-1pt]{\color{FigMute}Gen 5}};
+    \node[keep] (n51) at (1.2,-4.75)
+      {\ttbf{ID 051}\\[-1pt]{\color{FigMute}Gen 6}};
+
+    \coordinate (bus1) at (0,-0.55);
+    \draw[elink] (seed.south) -- (bus1);
+    \draw[elink] (bus1) -| (n15.north);
+    \draw[elink] (bus1) -- (n34.north);
+    \draw[elink] (bus1) -| (n48.north);
+
+    \draw[elink] (n15.south) -- (n44.north);
+    \draw[elink] (n34.south) -- (n45.north);
+
+    \coordinate (bus2) at (0,-3.8);
+    \draw[elink] (n44.south) -- ++(0,-0.22) -| (n49.north);
+    \draw[elink] (n45.south) -- (bus2);
+    \draw[elink] (bus2) -| (n49.north);
+    \draw[elink] (bus2) -| (n51.north);
+    \draw[elink] (n48.south) -- ++(0,-0.22) -| (n51.north);
+
+    \begin{scope}[on background layer]
+      \node[
+        draw=PassInk, line width=0.8pt, rounded corners=3.2pt,
+        fill=PassFill!35, inner xsep=8pt, inner ysep=7pt,
+        fit=(n44)(n45)(n49)(n51),
+      ] (retbox) {};
+    \end{scope}
+    % Inside the retained box, top-left corner (avoids edge crossings)
+    \node[
+      anchor=north west,
+      font=\sffamily\scriptsize\bfseries, text=PassInk,
+      fill=PassFill, inner sep=2.0pt, rounded corners=1.2pt,
+      draw=PassInk, line width=0.45pt,
+    ] at ($(retbox.north west)+(0.12,-0.1)$)
+      {Four Retained Skills};
+
+    \node[keep, minimum width=1.35cm, minimum height=0.38cm,
+      font=\sffamily\scriptsize, anchor=west] (lg1) at (-2.9,-5.85) {Retained};
+    \node[pruned, minimum width=1.35cm, minimum height=0.38cm,
+      font=\sffamily\scriptsize, right=0.2cm of lg1] (lg2) {Pruned};
+    \draw[elink] ($(lg2.east)+(0.22,0)$) -- ++(0.45,0)
+      node[right, font=\sffamily\scriptsize, text=FigMute] {Synthesis};
+  \end{tikzpicture}
+  \caption[Lineage of the synthesized skills in the Emerging experiment.]{%
+    Lineage of the synthesized skills in the Emerging experiment.
+    Solid edges are synthesis steps accepted by the
+    generator-verifier-reviewer loop.
+    Muted nodes are accepted by the verifier but pruned by the over-broad
+    filter.
+    Pass-filled nodes remain active in the final library.
+    All retained nodes run at Tier~0, which is why the evolved library adds
+    no LLM cost on the hot path.
+  }
+  \label{fig:appendix-evolution-lineage}
+\end{figure}

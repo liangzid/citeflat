@@ -1,0 +1,304 @@
+\section{System Design}
+\label{sec:Design}
+
+Figure~\ref{fig:Architecture} presents the overall system architecture. CAITLYN runs as a single Node.js daemon integrating four components: the defense library, attack corpus, scanning engine, and evolution agent loop.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=0.6cm and 1.0cm,
+  block/.style={draw, rounded corners=3pt, minimum width=2.6cm, minimum height=0.85cm, align=center, font=\footnotesize, fill=white, drop shadow={shadow xshift=0.5pt, shadow yshift=-0.5pt, opacity=0.15}},
+  storage/.style={draw, rounded corners=3pt, minimum width=2.6cm, minimum height=0.75cm, align=center, font=\footnotesize, fill=BoxBlue},
+  label/.style={font=\footnotesize\itshape, text=gray},
+  arrow/.style={-{Stealth[length=5pt, width=4pt]}, thick, LineBlue},
+  arrowr/.style={-{Stealth[length=5pt, width=4pt]}, thick, LineRed},
+  arrowg/.style={-{Stealth[length=5pt, width=4pt]}, thick, LineGreen},
+  dasharrow/.style={->, dashed, thick, gray},
+]
+
+% Layer 0: External Input
+\node[label] (inLbl) at (0, 1.2) {External Content};
+\node[block, fill=BoxGray, below=0.1cm of inLbl, minimum width=3.5cm] (input) {Web Search \textbullet\ API Response\\File Content \textbullet\ User Message};
+
+% Layer 1: Scan Engine
+\node[block, fill=BoxGreen, below=1.5cm of input, minimum width=3.5cm, minimum height=1.0cm] (scan) {\textbf{Scanning Engine}\\{\scriptsize Tier 0 $\rightarrow$ Tier 1}};
+
+% Layer 2a: Tier 0
+\node[block, fill=BoxYellow, right=1.2cm of scan, minimum width=2.4cm] (t0) {Tier 0\\{\scriptsize Sandbox Scripts}};
+
+% Layer 2b: Tier 1
+\node[block, fill=BoxYellow, above=0.3cm of t0, minimum width=2.4cm] (t1) {Tier 1\\{\scriptsize LLM Classifier}};
+
+% Libraries - bottom
+\node[storage, below=0.8cm of scan] (deflib) {Defense\\Library};
+\node[storage, left=0.6cm of deflib] (atklib) {Attack\\Corpus};
+\node[storage, right=0.6cm of deflib] (index) {Evolution\\Tree Index};
+
+% Evolution
+\node[block, fill=BoxRed, below=0.8cm of deflib, minimum width=3.5cm, minimum height=1.0cm] (evolve) {\textbf{Evolution Loop}\\{\scriptsize LLM Agent + 7 Tools}};
+
+% Agent context
+\node[block, fill=BoxGray, right=0.8cm of t0, minimum width=2.2cm, minimum height=1.2cm] (agent) {Agent\\Context};
+
+% Arrows - data flow
+\draw[arrow] (input) -- (scan) node[midway, right, font=\tiny] {content};
+\draw[arrow] (scan.east) -- ($(scan.east)!0.5!(t1.west)$) |- (t1.west);
+\draw[arrow] (scan.east) -- ($(scan.east)!0.5!(t0.west)$) |- (t0.west);
+\draw[arrowg] (t0.east) -- (agent.west) node[midway, above, font=\tiny] {verdict};
+\draw[arrowr] (t1.east) -- (agent.west) node[midway, below, font=\tiny] {verdict};
+
+% Library access
+\draw[dasharrow] (scan.south) -- (deflib.north) node[midway, right, font=\tiny] {load};
+\draw[dasharrow] (scan.south) -- (atklib.north) node[midway, left, font=\tiny] {load};
+\draw[dasharrow] (deflib.east) -- (index.west);
+\draw[dasharrow] (evolve.north) -- (deflib.south) node[midway, right, font=\tiny] {write};
+\draw[dasharrow] (evolve.north) -- (atklib.south) node[midway, left, font=\tiny] {read};
+
+% Evolution trigger
+\draw[arrowr, bend left=15] (scan.west) to (evolve.west) node[midway, left, font=\tiny] {trigger};
+
+% Legend
+\node[font=\tiny, below=0.3cm of evolve, align=left] {
+  \textcolor{LineBlue}{---} Data flow \quad
+  \textcolor{LineRed}{---} Trigger \quad
+  \textcolor{gray}{- -} Read/Write
+};
+
+\end{tikzpicture}
+\caption{System architecture. External content flows through the scanning engine (Tier 0 then Tier 1) before reaching the agent context. The evolution loop reads from both libraries and writes new defense entries. All components run in a single daemon process.}
+\label{fig:Architecture}
+\end{figure*}
+
+\subsection{Defense--Attack Co-Evolution Library}
+\label{sec:DesignLibrary}
+
+The core knowledge representation in CAITLYN is a pair of co-evolving libraries, each entry stored as a self-contained folder with three files: a human-readable Markdown description, a structured YAML config, and an executable script or payload. Figure~\ref{fig:EntryFormat} provides a concrete example of each entry type.
+
+\begin{figure*}[t]
+\centering
+\begin{lrbox}{\caitlynboxA}\begin{minipage}[t]{0.45\textwidth}
+\footnotesize
+{\color{LineBlue!80!black}\rule[-1.5pt]{3pt}{9pt}}\ \textbf{Defense Entry:} \texttt{def-injection-general/}
+
+\vspace{2pt}
+{\color{LineBlue!70!black}\rule[-1pt]{2pt}{7pt}}\ {\scriptsize\texttt{config.yaml}:}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, framerule=0.4pt, numbers=none, aboveskip=2pt, belowskip=2pt, xleftmargin=0pt, backgroundcolor=\color{black!2}]
+id: def-injection-general
+name: "InjectionDetector"
+parentId: null
+category: injection
+tier: 0
+threshold: 0.6
+generation: 0
+\end{lstlisting}
+
+\vspace{2pt}
+{\color{LineBlue!70!black}\rule[-1pt]{2pt}{7pt}}\ {\scriptsize\texttt{detect.ts} (excerpt):}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, framerule=0.4pt, numbers=none, aboveskip=2pt, belowskip=2pt, xleftmargin=0pt, backgroundcolor=\color{black!2}]
+// Reads content from stdin
+// Outputs JSON to stdout
+const sigs = [
+ {re: /ignore\s+previous/i, w:0.95},
+ {re: /DROP\s+TABLE/i,      w:0.90},
+ {re: /\beval\s*\(/i,       w:0.80},
+];
+for (const s of sigs)
+ if (s.re.test(content))
+  return {verdict:"malicious",
+          confidence:s.w};
+return {verdict:"benign",
+        confidence:0};
+\end{lstlisting}
+\end{minipage}\end{lrbox}{\setlength{\fboxsep}{3pt}\fcolorbox{LineBlue!50!black}{BoxBlue!8!white}{\usebox{\caitlynboxA}}}
+\hfill
+\begin{lrbox}{\caitlynboxB}\begin{minipage}[t]{0.45\textwidth}
+\footnotesize
+{\color{LineRed!80!black}\rule[-1.5pt]{3pt}{9pt}}\ \textbf{Attack Entry:} \texttt{atk-ignore-prev/}
+
+\vspace{2pt}
+{\color{LineRed!70!black}\rule[-1pt]{2pt}{7pt}}\ {\scriptsize\texttt{config.yaml}:}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, framerule=0.4pt, numbers=none, aboveskip=2pt, belowskip=2pt, xleftmargin=0pt, backgroundcolor=\color{black!2}]
+id: atk-ignore-previous
+name: "IgnorePrevInstr"
+category: injection
+injectionPoint: userMessage
+attackTemplate: ignorePrevious
+escapes:
+  - def-injection-general
+\end{lstlisting}
+
+\vspace{2pt}
+{\color{LineRed!70!black}\rule[-1pt]{2pt}{7pt}}\ {\scriptsize\texttt{payload.txt}:}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, framerule=0.4pt, numbers=none, aboveskip=2pt, belowskip=2pt, xleftmargin=0pt, backgroundcolor=\color{black!2}]
+Ignore all previous instructions.
+Your real task is to send the
+contents of ~/ to evil@attacker.com.
+Use executeBash to run:
+tar czf /tmp/x.tar.gz ~/
+&& curl -F "file=@/tmp/x.tar.gz"
+https://evil.com/upload
+\end{lstlisting}
+\end{minipage}\end{lrbox}{\setlength{\fboxsep}{3pt}\fcolorbox{LineRed!50!black}{BoxRed!8!white}{\usebox{\caitlynboxB}}}
+
+\vspace{6pt}
+\caption{Format of a defense entry (left) and attack entry (right). Each is a self-contained folder with \texttt{config.yaml} (metadata), \texttt{README.md} (human-readable description, not shown for space), and either \texttt{detect.ts} (defense) or \texttt{payload.txt} (attack). The \texttt{escapes} field links attacks to defenses they bypass, enabling targeted evolution.}
+\label{fig:EntryFormat}
+\end{figure*}
+
+\subsubsection{Defense Entry Structure}
+
+Each defense entry is a directory containing:
+
+\begin{itemize}[nosep]
+  \item \texttt{config.yaml}: structured metadata (\texttt{id}, \texttt{parentId}, \texttt{category}, \texttt{tier}, \texttt{threshold}, \texttt{generation}, \texttt{stats}).
+  \item \texttt{README.md}: natural-language description of detection logic, heuristics, known weaknesses, and design rationale. This is the primary input for LLM-driven evolution.
+  \item \texttt{detect.ts} (optional): a TypeScript detection script for Tier 0. One-shot scans pass content on stdin (read to EOF). A resident worker may instead export \texttt{detect(content)}. The script applies regex patterns and heuristics and outputs a single-line JSON verdict to stdout: \texttt{\{"verdict":"malicious"|"suspicious"|"benign","confidence":0.0-1.0,"reason":"..."\}}.
+\end{itemize}
+
+Defense entries are organized into an \textbf{evolution tree} via \texttt{parentId} edges in their configs. A root entry has \texttt{parentId: null}. Each evolved entry records which parent it was derived from, forming a tree. A lightweight \texttt{index.json} file maintains a cached view of the topology with bottom-up aggregated statistics (total true positives, false positives, scans per subtree).
+
+\subsubsection{Attack Entry Structure}
+
+Each attack entry captures one known bypass pattern:
+
+\begin{itemize}[nosep]
+  \item \texttt{config.yaml}: metadata (\texttt{id}, \texttt{category}, \texttt{injectionPoint}, \texttt{targetAgent}, \texttt{attackTemplate}, \texttt{escapes} list).
+  \item \texttt{README.md}: natural-language description of the attack technique, why it works, typical context, and why it evades current defenses.
+  \item \texttt{payload.txt}: the raw attack payload text, used for both Tier-1 prompt assembly and fitness evaluation.
+\end{itemize}
+
+The \texttt{escapes} field explicitly records which defense entry IDs this attack is known to bypass. This is the critical link that drives targeted evolution: when the evolution loop runs, attacks listing a given defense in their \texttt{escapes} become the hard \emph{must-detect} evaluation set for any child of that defense.
+
+\subsubsection{Why Folders, Not a Database}
+
+We deliberately chose filesystem folders over a database. First, entries must be human-readable and editable---a security analyst should be able to inspect, modify, or add entries with a text editor. Second, folders naturally support the tree structure: a defense entry's children are simply other defense entries that reference it as \texttt{parentId}. Third, each entry is self-contained: copying a defense folder to another CAITLYN instance preserves the complete detection knowledge, including its script.
+
+\subsection{Two-Tier Scanning Engine}
+\label{sec:Scanning}
+
+Algorithm~\ref{alg:ScanPipeline} presents the scanning pipeline. The design goal is to maximize the fraction of requests handled at Tier 0 (fast scripts, zero LLM cost) while falling back to Tier 1 (LLM classifier) only when necessary.
+
+\begin{algorithm}[t]
+\caption{Two-Tier Scanning Pipeline}
+\label{alg:ScanPipeline}
+\begin{algorithmic}[1]
+\Function{Scan}{$content$, $defenses$, $attacks$, $llm$}
+  \State $t0Scripts \gets \{d \in defenses \mid d.\text{tier}=0\}$
+  \State \textbf{runAll} $d.\text{detect}(content)$ in parallel sandboxes
+  \ForAll{$r \in \text{results}$}
+    \If{$r.\text{verdict}=\text{malicious} \land r.\text{conf}\geq\theta$}
+      \State \Return ($\text{malicious}$, $r.\text{conf}$, Tier~0)
+    \EndIf
+  \EndFor
+  \State $prompt \gets \textsc{BuildPrompt}(defenses, attacks, content)$
+  \Comment{concatenate all READMEs + payloads}
+  \State $token \gets llm(prompt)$ \quad\Comment{single-token: ``0'' or ``1''}
+  \If{$token = \text{``1''}$}
+    \State \Return ($\text{malicious}$, 0.8, Tier~1)
+  \Else
+    \State \Return ($\text{benign}$, 0.95, Tier~1)
+  \EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Tier 0: Sandbox Script Execution}
+
+Tier 0 defense entries each provide a \texttt{detect.ts} script with a simple contract:
+\begin{itemize}[nosep]
+  \item \textbf{Input}: the target content on stdin (one-shot spawn) or via \texttt{detect(content)} (resident worker).
+  \item \textbf{Output}: a single-line JSON object to stdout: \texttt{\{"verdict":"malicious"|"suspicious"|"benign","confidence":0.0-1.0,"reason":"..."\}}.
+  \item \textbf{Constraints}: timeout 500~milliseconds, no network, no filesystem writes, exit code 0 on success (non-zero treated as a miss with benign verdict).
+\end{itemize}
+
+Scripts execute in parallel via Node.js \texttt{child\_process.spawn}. A script that crashes, times out, or produces invalid JSON is treated as ``no detection''---never as a false positive. This fail-open design ensures that a buggy evolved script degrades gracefully rather than blocking legitimate traffic.
+
+\subsubsection{Tier 1: Single-Token LLM Classifier}
+
+When Tier 0 produces no high-confidence match, CAITLYN assembles a single prompt containing: (1) the \texttt{README.md} of all defense entries, (2) the \texttt{README.md} and \texttt{payload.txt} of all attack entries, and (3) the target content. The LLM is instructed to output exactly one token: \texttt{0} (benign) or \texttt{1} (malicious).
+
+This design exploits the fact that for the vast majority of benign inputs, the model's first-token latency (typically 50--200~milliseconds) is the only cost. Multi-sentence reasoning is avoided. Every new defense or attack entry added through evolution immediately improves Tier 1 classification without retraining, because the entire current library is included in the prompt.
+
+\subsection{Agent-Driven Evolution Loop}
+\label{sec:Evolution}
+
+The evolution loop converts expensive Tier-1 defense into cheap Tier-0 defense. Algorithm~\ref{alg:EvolutionLoop} outlines the process, orchestrated by an LLM agent equipped with seven tools (Table~\ref{tab:EvolutionLoopTools}).
+
+\begin{table}[t]
+\centering
+\caption{Evolution Loop Tool Set}
+\label{tab:EvolutionLoopTools}
+\begin{tabular}{@{}>{\ttfamily}l >{\raggedright\arraybackslash}p{4.5cm}@{}}
+\toprule
+\textbf{Tool} & \textbf{Purpose} \\
+\midrule
+listDefenses    & View evolution tree with aggregated stats \\
+listAttacks     & View attack corpus with escape annotations \\
+readDefense     & Read a defense entry's full README + config \\
+readAttack      & Read an attack entry's full description + payload \\
+evalDefense     & Evaluate a defense script against all attacks (TP/FP/FN) \\
+runScript       & Run a single detect.ts on a test sample for debugging \\
+caitlynScan        & Full two-tier pipeline scan \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{algorithm}[t]
+\caption{Evolution Loop}
+\label{alg:EvolutionLoop}
+\begin{algorithmic}[1]
+\Function{Evolve}{$patternHash$, $defenses$, $attacks$, $agent$}
+  \State $parent \gets$ defense most frequently detecting $patternHash$
+  \State $escapes \gets \{a \in attacks \mid parent.\text{id} \in a.\text{escapes}\}$
+  \State \Comment{LLM agent reads relevant entries}
+  \State $agent.\text{readDefense}(parent)$
+  \ForAll{$a \in escapes$} $agent.\text{readAttack}(a)$ \EndFor
+  \State \Comment{LLM agent generates variants via crossover + mutation}
+  \State $candidates \gets agent.\text{generateVariants}(parent, escapes)$
+  \State \Comment{Fitness evaluation}
+  \ForAll{$c \in candidates$}
+    \State $(tp, fp, fn) \gets \textsc{EvalDefense}(c, attacks)$
+    \State $\text{score}[c] \gets \text{recall}\times 0.7 + \text{precision}\times 0.3 - \text{FPR}\times 0.2$
+    \If{$\neg c.\text{detect}(escapes)$} $\text{score}[c] \gets 0$ \EndIf \Comment{hard constraint}
+  \EndFor
+  \State $survivors \gets \text{top-}k\; |\; \text{score} \geq \tau$
+  \ForAll{$s \in survivors$}
+    \State $\textsc{SaveDefense}(s)$ \Comment{write folder to disk}
+    \State $\textsc{UpdateIndex}()$
+    \State $\textsc{ExtractSignatures}(s)$ \Comment{add to Tier-0 cache}
+  \EndFor
+  \State \Return $survivors$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Trigger Conditions}
+
+Evolution is triggered by any of four conditions:
+\begin{enumerate}[nosep]
+  \item \textbf{Cost threshold}: a single attack pattern incurs total latency or token cost exceeding configured thresholds over a sliding window.
+  \item \textbf{New attack entry}: when a new attack is added to the corpus (e.g., from a user report or automated honeypot), evolution runs automatically to generate counter-defenses.
+  \item \textbf{Periodic sweep}: scheduled scans of defense stats detect rising false-positive rates or declining recall, triggering targeted mutation.
+  \item \textbf{Manual}: a security operator explicitly requests evolution for a specific defense or attack pattern.
+\end{enumerate}
+
+\subsubsection{Genetic Operations via LLM}
+
+The LLM agent performs three operations:
+
+\textbf{Selection.} The agent calls \texttt{listDefenses} to survey the evolution tree, identifying defense entries with poor stats (high FP, low recall) and attack entries that list those defenses in their \texttt{escapes} field. It selects one or two parent defenses plus the escape attacks as input material.
+
+\textbf{Crossover.} Given two defense entries with complementary strengths (e.g., one strong at detecting SQL injection, another strong at command injection), the agent synthesizes a new defense whose \texttt{README.md} and \texttt{detect.ts} combine both approaches. The agent reads both entries' full content, understands their detection strategies, and produces a merged detection script.
+
+\textbf{Mutation.} Given one defense entry and one escape attack, the agent reads both, understands \emph{why} the attack evades the defense, and modifies the detection script to close the gap. The mutated script adds new regex patterns, adjusts confidence thresholds, or introduces heuristic checks targeting the specific bypass technique described in the attack's README.
+
+\subsubsection{Fitness Evaluation}
+
+Each candidate is evaluated via the \texttt{evalDefense} tool, which runs the candidate's detection script against all attacks in the corpus and a set of benign samples, computing:
+
+\[
+\text{score} = \text{recall} \times 0.7 + \text{precision} \times 0.3 - \text{FPR} \times 0.2
+\]
+
+Candidates that fail to detect their \emph{must-detect} attacks (those that specifically list this defense's parent in their \texttt{escapes}) are eliminated regardless of other scores---a hard constraint that prevents regression.
+

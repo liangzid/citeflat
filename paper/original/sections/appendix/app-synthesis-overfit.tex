@@ -1,0 +1,35 @@
+
+\subsection{Overfitting Controls in Skill Synthesis}
+\label{app:synthesis-overfit}
+
+Synthesizing effective defense skills requires balancing two opposing
+risks: over-specialization to specific attack variants and
+over-generalization that triggers false positives on benign
+traffic. System~II enforces this balance by decoupling the validation
+constraints applied to candidate skills from the information exposed
+to the generator.
+
+Here the verifier serves as the strict quality gate. Specifically, a
+candidate skill is accepted only if it matches all attack trigger
+samples while firing on no more than one of benign samples. To prevent
+Denial-of-Service via regex exploitation, checks execute in an
+isolated child process subject to a 200~milliseconds timeout alongside
+static regex analysis. Crucially, the generator operates across an
+information barrier: it receives only a structured abstract profile of
+the attack (e.g., length, sample count, keyword matches, Shannon
+entropy, and encoding flags), the current skill graph metadata, and
+failure feedback from prior rounds, rather than the raw trigger
+text. To broaden coverage without compromising validation rigor, a
+small cluster of nearest-neighbor attack samples is provided as
+contextual guidance, though these are excluded from the formal pass
+predicate.
+When an entire synthesis round fails, the engine transitions from
+fresh generation to targeted mutation on the best candidate marked for
+revision. Once accepted, candidates lacking concrete payloads undergo
+post-acceptance gating: they enter a shadow observation mode and
+remain non-blocking until completing a seven-day or 50-scan clean
+window with zero false positives and at least one confirmed
+hit. Finally, as a fail-safe against overly broad signatures that
+bypass earlier checks, such as predicates matching generic environment
+content, a pre-deployment filter prunes loose rules before active rollout.
+

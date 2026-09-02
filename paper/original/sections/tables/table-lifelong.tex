@@ -1,0 +1,32 @@
+%----------------------------------------------------------------------
+% Lifelong synthesis endpoint (Section LifelongSynthesis)
+% Detection-only on Emerging held-out cases. Blocked = malicious.
+% Sequential numbers are after the 5.1 over-broad filter.
+%----------------------------------------------------------------------
+\begin{table}[t]
+  \centering
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \caption{
+    Lifelong synthesis at the end of the nine-family stream.
+    Held-out TPR is measured on the 100 Emerging held-out cases.
+    FPR uses the shared benign pool.
+  }
+  \label{tab:lifelong-synthesis}
+  \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcccc@{}}
+    \toprule
+    Method & Held-out TPR & FPR & Skills & Tokens \\
+    \midrule
+    Static
+      & 16.0 & 1.6 & 0 & 0 \\
+    Batch
+      & 16.0 & 1.6 & 0 & 20331 \\
+    Sequential
+      & 30.0 & 1.6 & 4 & 104932 \\
+    \bottomrule
+  \end{tabular*}
+
+  % \smallskip
+  % \footnotesize
+  % TPR and FPR are in percent. Shaded row is the reported Sequential configuration.
+\end{table}

@@ -1,0 +1,53 @@
+%----------------------------------------------------------------------
+% System I ablation (Section 4.4)
+% One paired detection-only run of six variants.
+% TPR is per dataset. FPR uses the shared benign pool.
+% Latency and USD are mean wall-clock time and mean provider cost
+% per inspection on that run. Wall-clock latency can shift across
+% measurement windows as the serving path becomes more contended.
+%----------------------------------------------------------------------
+\begin{table*}[!ht]
+  \centering
+  \setlength{\tabcolsep}{4pt}
+\caption{
+    Ablation study under the detection-only protocol.
+    One paired run of six variants: Tier-0 only, Tier-1 only, the
+    per-detector ensemble, one-call merged detectors, one-call merged
+    knowledge, and the full two-call OR schema.
+    TPR is per dataset. FPR uses the shared benign pool.
+    Latency and USD are mean time and mean provider cost
+    per inspection on this run. Latency can vary across
+    measurement windows.
+  }
+  \label{tab:ablation-system-i}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}lccccccc@{}}
+    \toprule
+    \multirow{2}{*}{\textbf{Variant}}
+      & \multicolumn{4}{c}{\textbf{TPR (\%)}}
+      & \multirow{2}{*}{\textbf{FPR (\%)}}
+      & \multirow{2}{*}{\textbf{Latency (s)}}
+      & \multirow{2}{*}{\textbf{USD}} \\
+    \cmidrule(lr){2-5}
+      & AgentDojo-S250 & ASPI-S & SafeClawBench-S240 & AgentDefense-S250 & & & \\
+    \midrule
+    Tier-0 only
+      & 3.2 & 5.4 & 17.5 & 48.4 & 0.0 & 0.01 & 0 \\
+    Tier-1 only
+      & 96.8 & 73.1 & 81.7 & 80.8 & 6.0 & 8.49 & 0.00099 \\
+    Ensemble
+      & 100.0 & 91.4 & 65.4 & 84.0 & 6.8 & 5.20 & 0.00022 \\
+    Merged-Knowledge
+      & 100.0 & 86.0 & 67.1 & 79.2 & 4.0 & 2.71 & 0.00075 \\
+    Merged-Detectors
+      & 100.0 & 88.2 & 78.8 & 75.2 & 1.6 & 2.38 & 0.00025 \\
+    Full
+      & 100.0 & 89.2 & 82.1 & 82.0 & 3.2 & 5.17 & 0.00100 \\
+    \bottomrule
+  \end{tabular}%
+  }
+
+  % \smallskip
+  % \footnotesize
+  % Shaded row is the paper System~I configuration.
+\end{table*}

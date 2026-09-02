@@ -1,0 +1,109 @@
+% System II synthesis loop.
+% Included from the appendix (app-system-ii-loop.tex).
+% Full-width single-column pseudocode via figure* + native algorithm float.
+
+\definecolor{AlgoComment}{RGB}{0,90,255}
+\algrenewcommand{\algorithmiccomment}[1]{%
+  \hfill\textcolor{AlgoComment}{\footnotesize\textit{// #1}}%
+}
+\algnewcommand{\PhaseComment}[1]{%
+  \Statex \textcolor{AlgoComment}{\footnotesize\textit{// #1}}%
+}
+\algtext*{EndIf}
+\algtext*{EndFor}
+
+\begin{figure*}[tp!]
+\begingroup
+\setlength{\columnwidth}{\textwidth}
+\begin{algorithm}[t]
+\caption{System~II synthesis loop}
+\label{alg:EvolutionLoop}
+\small
+\begin{algorithmic}[1]
+\Require trigger samples $\mathcal{T}$, benign samples $\mathcal{B}$, skill library $\mathcal{S}$
+\Require lesson store $\mathcal{L}$, attack-sample corpus $\mathcal{K}$
+\Require autonomy mode $\in \{\ttbf{record},\ttbf{candidate},\ttbf{auto}\}$
+\Ensure admitted skill $s^{\star}$ or $\varnothing$
+\State $R \gets 5$,\ $n \gets 3$,\ $N \gets 40000$,\ $m_B \gets 5$,\ $\varepsilon \gets 1$,\ $t_{\lim} \gets 200$~milliseconds
+\State $k_{\mathrm{sim}} \gets 3$,\ $k_{L} \gets 10$
+\State $W \gets \{\ttbf{ignore}, \ttbf{instructions}, \ttbf{system prompt}, \ttbf{reveal}\}$
+\State $W \gets W \cup \{\ttbf{jailbreak}, \ttbf{dan}, \ttbf{forget}, \ttbf{previous}, \ttbf{hidden}\}$
+\If{autonomy $= \ttbf{record}$}
+  \State \Return $\varnothing$
+\EndIf
+\PhaseComment{Generator-side profile. Raw $\mathcal{T}$ never enters $\mathrm{Generate}$}
+\State $u \gets$ concatenation of all $x \in \mathcal{T}$
+\State $\varphi_{\mathrm{len}} \gets |u|$
+\State $\varphi_{n} \gets |\mathcal{T}|$
+\Comment{sample count, not newline count}
+\State $\varphi_{\mathrm{kw}} \gets \{ w \in W \mid w \text{ occurs in } u \}$
+\State $\varphi_{H} \gets$ Shannon entropy of character frequencies in $u$
+\State $\varphi_{\mathrm{b64}} \gets$ boolean flag: $u$ matches base64-like surface form
+\State $\varphi_{\mathrm{hex}} \gets$ boolean flag: $u$ matches hex-like surface form
+\State $\varphi \gets (\varphi_{\mathrm{len}}, \varphi_{n}, \varphi_{\mathrm{kw}}, \varphi_{H}, \varphi_{\mathrm{b64}}, \varphi_{\mathrm{hex}})$
+\State $\mathcal{B}' \gets$ the first $m_B$ entries of $\mathcal{B}$
+\State $\mathrm{Sim} \gets$ the $k_{\mathrm{sim}}$ samples in $\mathcal{K}$ with highest Jaccard overlap with $u$
+\Comment{attack neighbors, generator only, not in $\mathrm{Pass}$}
+\State $\mathcal{L}_{c} \gets$ the $k_{L}$ most recent lessons of the cluster of $\mathcal{T}$
+\State $\mathit{shm} \gets \bot$,\quad $\mathit{cost} \gets 0$
+\PhaseComment{CEGIS rounds: generate, sandbox, review}
+\For{$r \gets 1$ \textbf{to} $R$}
+  \If{$\mathit{cost} \ge N$}
+    \State \Return $\varnothing$
+  \EndIf
+  \State $\Sigma_{\mathrm{exist}} \gets$ all signature patterns currently in $\mathcal{S}$
+  \State $\mathcal{C} \gets \mathrm{Generate}(\varphi, \mathrm{Sim}, \mathrm{Meta}(\mathcal{S}), \Sigma_{\mathrm{exist}}, \mathcal{L}_{c}, \mathit{shm})$
+  \Comment{$|\mathcal{C}|\le n$. Generator prompt forbids overlap with $\Sigma_{\mathrm{exist}}$}
+  \State $\mathit{cost} \gets \mathit{cost} + \mathrm{Tok}(\mathrm{Generate})$
+  \If{$\mathcal{C}=\varnothing$}
+    \State \Return $\varnothing$
+  \EndIf
+  \ForAll{$s \in \mathcal{C}$}
+    \State $\Sigma \gets$ signatures of $s$ excluding nested-quantifier regexes
+    \State execute $\Sigma$ on $\mathcal{T} \cup \mathcal{B}'$ in a child process
+    \Comment{exact: substring. regex: case-insensitive}
+    \If{runtime $> t_{\lim}$}
+      \State kill the child
+      \State $\mathcal{H}^{+} \gets \varnothing$,\quad $\mathcal{H}^{-} \gets \mathcal{B}'$,\quad $\mathrm{Pass} \gets \mathbf{false}$
+    \Else
+      \State $\mathcal{H}^{+} \gets \{ x \in \mathcal{T} \mid \exists\, \sigma \in \Sigma:\ \sigma \text{ hits } x \}$
+      \State $\mathcal{H}^{-} \gets \{ x \in \mathcal{B}' \mid \exists\, \sigma \in \Sigma:\ \sigma \text{ hits } x \}$
+      \State $\mathrm{Pass} \gets \bigl(|\mathcal{H}^{+}|=|\mathcal{T}|\bigr) \land \bigl(|\mathcal{H}^{-}|\le \varepsilon\bigr)$
+    \EndIf
+    \State $v \gets \mathrm{Review}(s, (\mathrm{Pass}, |\mathcal{H}^{+}|, |\mathcal{H}^{-}|, |\mathcal{B}'|), \mathrm{Meta}(\mathcal{S}))$
+    \Comment{$v\in\{\Cat{ACCEPT},\Cat{REVISE},\Cat{REJECT}\}$. $\mathcal{L}$ is hidden from reviewer}
+    \State $\mathit{cost} \gets \mathit{cost} + \mathrm{Tok}(\mathrm{Review})$
+    \State append round result to $\mathcal{L}$ and refresh $\mathcal{L}_{c}$
+    \If{$\mathrm{Pass}$ \textbf{and} $v=\Cat{ACCEPT}$}
+      \State $\mathrm{parents}(s) \gets$ parent identifiers declared by $s$ that exist in $\mathcal{S}$
+      \If{$\mathrm{parents}(s)=\varnothing$}
+        \State $\mathrm{generation}(s) \gets 0$
+      \Else
+        \State $\mathrm{generation}(s) \gets 1+\max_{p\in\mathrm{parents}(s)}\mathrm{generation}(p)$
+      \EndIf
+      \State $\mathit{status} \gets \Cat{CANDIDATE}$
+      \If{$\mathcal{T}\neq\varnothing$ \textbf{and} autonomy $= \ttbf{auto}$}
+        \State $\mathit{status} \gets \Cat{ACTIVE}$
+      \EndIf
+      \Comment{if $\mathit{status}=\Cat{CANDIDATE}$ on unknown-threat path, engine starts shadow observation}
+      \State $\mathcal{S} \gets \mathcal{S} \cup \{s\}$ with status $\mathit{status}$
+      \State $s^{\star} \gets s$
+      \State \Return $s^{\star}$
+    \EndIf
+    \If{$v=\Cat{REVISE}$}
+      \State $\mathit{shm} \gets$ revise target $(s, \text{review suggestion})$
+      \Comment{optional SHM fallback on next round when enabled}
+    \EndIf
+  \EndFor
+  \State $\mathcal{L}_{c} \gets$ the $k_{L}$ most recent lessons of the cluster of $\mathcal{T}$
+\EndFor
+\State \Return $\varnothing$
+\end{algorithmic}
+\end{algorithm}
+\endgroup
+\end{figure*}
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: "../main"
+%%% End:

@@ -1,0 +1,38 @@
+\subsection{Terminal User Interface}
+\label{app:tui}
+
+The reference implementation ships both a command-line interface and a
+full-screen terminal user interface.
+The CLI covers one-shot scans, library inspection, and defense telemetry
+without entering an interactive session.
+The TUI exposes the same defense surface through slash commands, modal
+overlays, and a streaming chat pane built on the same session model as a
+modern coding agent.
+
+\paragraph{CLI.}
+Figure~\ref{fig:appendix-cli-help} lists the top-level command surface.
+Figure~\ref{fig:appendix-cli-status} shows the antibody and antigen library
+inventory.
+Figure~\ref{fig:appendix-cli-dashboard} reports defense telemetry from the
+CLI dashboard.
+Figure~\ref{fig:appendix-cli-scan} records a single-shot scan that matches
+Tier~0 signatures without an LLM call.
+All four panels are drawn from live CLI transcripts on a development
+workstation after the evaluation campaigns in
+Section~\ref{sec:evaluation}.
+
+\paragraph{TUI.}
+Figure~\ref{fig:appendix-tui-cold} shows the cold-start screen with the
+logo, status footer, and empty editor.
+Figure~\ref{fig:appendix-tui-dashboard} shows the defense-dashboard overlay
+opened with \texttt{/dashboard}.
+Sessions persist as append-only JSONL files under
+\texttt{\textasciitilde/.caitlyn/sessions/}, so every scan, vaccination, and
+branch is reproducible from the session log alone.
+The dashboard reads the same statistics events that drive System~II
+triggers, which lets operators observe anomaly signals before an immune
+response is raised.
+Table~\ref{tab:appendix-tui-commands} lists the defense-facing and
+session slash commands.
+
+\input{sections/appendix/tables/table-tui-commands}

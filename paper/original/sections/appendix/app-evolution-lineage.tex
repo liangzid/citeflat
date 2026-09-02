@@ -1,0 +1,27 @@
+\subsection{Evolution Lineage of Synthesized Skills}
+\label{app:evolution-lineage}
+
+\input{sections/appendix/fig-evolution-lineage}
+
+Every skill accepted by System~II is materialized as a node in the defense
+DAG, and its \ttbf{parentIds} record the ancestors it refines.
+The Emerging end-to-end experiment ran 77 evolution runs over the seed
+failures of the 100 seed cases.
+Across 18 accepting responses the loop materializes 24 skills, of which
+only four survive the over-broad filter of
+Appendix~\ref{app:synthesis-overfit} and remain active in the deployed
+end-to-end library.
+These four skills are not the four sequential-stream skills of
+Table~\ref{tab:appendix-lifelong-waves}.
+Figure~\ref{fig:appendix-evolution-lineage} shows the lineage of these four
+skills, together with the intermediate nodes that were pruned.
+The retained skills are deliberately narrow.
+Each predicate combines single-line structure, a bounded length band, a high
+Shannon entropy, and a pipe-to-shell pattern, which is the exact shape of the
+seed failures they were synthesized from.
+We omit the literal predicates here for the same reason the over-broad
+filter exists: a signature that encodes a precise length band is easy to
+audit, but it is also easy to evade by rewriting, as quantified in
+Section~\ref{sec:AdaptiveAttacks}.
+The lineage therefore serves as evidence of traceability, not of
+generalization.

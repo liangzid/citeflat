@@ -1,0 +1,222 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CAITLYN: Continuous Agents for Injection Threats via Lifelong Yielding Nexus
+% An Adaptive Defense Middleware for LLM Agents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[letterpaper,twocolumn,10pt]{article}
+\PassOptionsToPackage{table}{xcolor}
+\usepackage{usenix}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\newtheorem{observation}{Observation}[section]
+
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{algorithm}
+
+\usepackage{algpseudocode}
+\usepackage{placeins}
+\usepackage{capt-of}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{cleveref}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage[most]{tcolorbox}
+\usetikzlibrary{arrows.meta, positioning, shapes, fit, backgrounds, calc, trees, decorations.pathreplacing, shadows.blur, shapes.multipart, matrix, patterns}
+
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny,
+  xleftmargin=2em,
+}
+
+\input{sections/fig-palette-methodology}
+
+\definecolor{BoxBlue}{RGB}{225,235,250}
+\definecolor{BoxGreen}{RGB}{220,245,225}
+\definecolor{BoxRed}{RGB}{255,230,230}
+\definecolor{BoxYellow}{RGB}{255,250,220}
+\definecolor{BoxGray}{RGB}{245,245,245}
+\definecolor{LineBlue}{RGB}{40,80,180}
+\definecolor{LineRed}{RGB}{180,40,40}
+\definecolor{LineGreen}{RGB}{30,130,60}
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+
+% Override usenix.sty defaults (green links) for in-document cross-refs.
+\hypersetup{linkcolor=cvprblue}
+
+\newsavebox{\caitlynboxA}
+\newsavebox{\caitlynboxB}
+
+% Discrete labels and modes in System I. Safe in both text and math.
+\newcommand{\Cat}[1]{\text{\texttt{#1}}}
+% Bold typewriter for identifiers in the appendix (and shared call sites).
+% Wrap with \text so the command is safe in math (e.g. Algorithm~2).
+\newcommand{\ttbf}[1]{\text{\ttfamily\bfseries #1}}
+\newcommand{\ie}{i.e.}
+\newcommand{\eg}{e.g.}
+\newcommand{\lzn}[1]{\textcolor{red}{#1}}
+
+\begin{document}
+\date{}
+
+\title{\Large \bf CAITLYN: Can LLM Agents Autonomously Synthesize Defenses
+  against\\Emerging Injection Attacks?}
+
+% Anonymous submission per the USENIX Security '27 CFP: no author names or
+% affiliations may appear on the title page. Restore the real author block
+% for the camera-ready version.
+\author{
+{\rm Anonymous Author(s)}
+}
+
+\maketitle
+
+\begin{abstract}
+Prompt injection attacks on Large Language Model (LLM) agents seek to
+introduce malicious instructions or content into external text sources
+retrieved by agents, forcing the underlying LLMs to execute harmful
+actions outside their benign scope.
+While current defenses effectively counter known injection attacks,
+deploying them in LLM agent environments remains challenging due to
+attack variants and emerging threats. Moreover, existing solutions typically
+suffer from an inherent trilemma, i.e., a constant trade-off among runtime
+efficiency, contextual precision, and adaptability.
+To bridge this gap, we propose Continuous Agents for Injection
+Threats via Lifelong Yielding Nexus (CAITLYN), an agent-agnostic
+defense middleware. CAITLYN integrates two systems. System I focuses
+on immediate defense against existing attacks using a two-tiered
+library: Tier-0 for rule-based detection scripts and Tier-1 for
+optimized LLM-based accurate inference. System II, in contrast, is
+deployed to monitor potential abnormal signals and attempt to
+synthesize new defenses.
+On standard benchmarks, CAITLYN matches the detection performance of
+state-of-the-art defenses at lower token overhead than LLM-as-a-judge
+baselines. On \textbf{Emerging}, our new delivery-aware benchmark
+featuring novel injection techniques, static baselines and the
+standalone System I configuration remain vulnerable. In contrast,
+System II autonomously synthesizes verified defense capabilities,
+substantially lowering the attack success rate across three diverse
+agent environments.
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/background}
+\input{sections/methodology}
+\input{sections/evaluation}
+
+\section{Conclusion}
+
+In this paper, we introduced CAITLYN, an agent-agnostic defense
+middleware designed to resolve the fundamental trilemma among runtime
+efficiency, contextual precision, and post-deployment adaptability.
+By abstracting security controls into executable,
+modular defense skills, CAITLYN addresses prompt injection threats
+through a dual-system architecture. System~I provides immediate,
+low-latency inspection via a tiered gatekeeper, while System~II
+establishes an autonomous, lifelong evolution loop that converts
+runtime detection misses into verified, reusable defense skills.
+Extensive experiments demonstrate that CAITLYN matches the detection
+accuracy of existing defenses on standard benchmarks, with
+lower token overhead than LLM-based baselines.
+Evaluations on our
+delivery-aware benchmark, \emph{Emerging}, highlight the necessity of
+lifelong synthesis: while static baselines remain vulnerable to
+novel injection vectors, the autonomous adaptation loop of CAITLYN
+rapidly closes coverage gaps
+without a significant increase in false positives.
+We hope CAITLYN provides a practical foundation for
+LLM agent security.
+
+
+
+
+% Acknowledgments are intentionally omitted from the anonymized submission,
+% per the USENIX Security '27 double-blind policy. Restore them for the
+% camera-ready version.
+
+% USENIX Security '27 template order after the main body:
+% Ethical Considerations (recommended) → Open Science (mandatory) →
+% References → optional appendices. Body ≤13 pages excludes references
+% and any appendices. One clear page after the conclusion keeps the body
+% boundary countable. Ethics, Open Science, and References flow without
+% forced page breaks (template marks those clears as optional).
+\clearpage
+\appendix
+\section*{Ethical Considerations}
+
+LLM-based agent systems are being widely deployed, yet the security
+threats they introduce remain insufficiently understood. The attack
+patterns and benchmark cases in this paper are intended solely to
+evaluate and quantify these threats, not to promote real-world
+exploitation. We acknowledge that the released attack corpus and the
+System~II synthesis loop could be misused, but we hold that disclosing
+these threats together with verified defenses is more necessary than
+leaving them undocumented, consistent with the Menlo
+Report~\cite{menlo2012}. The primary contribution of this work is
+mitigation: CAITLYN converts detection misses into audited defense
+skills, and optional cloud synchronization is disabled by default.
+
+All experiments run in isolated Docker containers with per-case clean
+workspaces. Poisoned tool outputs are served from a controlled local
+server, not from live third-party sites. Evaluations use public
+benchmarks together with the synthetic \emph{Emerging} dataset. No
+experiment targets production services or unconsenting human subjects,
+and the study involves no personally identifiable information.
+
+\section*{Open Science}
+
+All artifacts required to reproduce the evaluation will be made
+available: (1) the CAITLYN implementation as a self-contained
+TypeScript daemon; (2) the defense library and attack corpus formatted
+in the human-readable folder structure described in the paper; and (3)
+the evaluation harness, which includes the five agent configurations,
+baseline defenses, attack and benign task sets, and execution scripts
+to regenerate all reported tables. Currently, the artifacts
+are shared via an anonymous, non-tracking repository at
+\url{https://anonymous.4open.science/r/caitlyn/}. Upon
+acceptance, all public-release artifacts will migrate to a permanent,
+non-anonymous link, with any residual restrictions documented in this
+appendix.
+
+\bibliographystyle{plainurl}
+\bibliography{main}
+
+\clearpage
+% Optional technical appendices (after references). Outline is
+% single-column in a box; appendix body stays two-column.
+\input{sections/appendix/app-outline}
+
+\section{Synthesis Internals}
+\label{app:synthesis-internals}
+\input{sections/appendix/app-synthesis-overfit}
+\input{sections/appendix/app-prompts-config}
+
+\section{Defense Library Artifacts}
+\label{app:library-artifacts}
+\input{sections/appendix/app-skill-inventory}
+\input{sections/appendix/app-evolution-lineage}
+\input{sections/appendix/app-evolution-stats}
+
+\section{Extended Evaluation}
+\label{app:extended-evaluation}
+\input{sections/appendix/app-detection-supplement}
+\input{sections/appendix/app-emerging-benchmark}
+\input{sections/appendix/app-lifelong-waves}
+\input{sections/appendix/app-adaptive-attacks}
+\input{sections/appendix/app-case-traces}
+\input{sections/appendix/app-appendix-cd-prose}
+
+% Appendix E (System II synthesis-loop pseudocode) deferred.
+% \input{sections/appendix/app-system-ii-loop}
+
+\end{document}

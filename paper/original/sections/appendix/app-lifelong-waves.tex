@@ -1,0 +1,29 @@
+\subsection{Lifelong Synthesis Wave Detail}
+\label{app:lifelong-detail}
+
+\input{sections/appendix/tables/table-lifelong-waves}
+
+Section~\ref{sec:LifelongSynthesis} reports the endpoint of the
+nine-family stream.
+Table~\ref{tab:appendix-lifelong-waves} reports every wave: the held-out
+size of the current family, the held-out TPR of that family after the
+over-broad filter, the generator tokens spent, the termination reason,
+and the number of active skill nodes.
+The wave-level trace makes three points that the endpoint table cannot.
+First, the false-positive rate stays at 1.6\% on every wave, so the
+coverage gains do not accumulate utility damage.
+Second, most large families terminate without a surviving skill
+(Generation Failed or Max Rounds). Policy Delta is the exception among
+those families: it reports Accept and keeps one skill after the
+over-broad filter (Skills column reports 1), yet current-family held-out TPR stays
+at 7.7\%, matching the static rate on that split.
+Third, coverage gains appear on the small Ledger Update and Mail Followup
+clusters, which accept predicates that survive pruning. The Mail Followup
+wave raises the active count from 2 to 4 under a single Accept
+termination, so one Accept may admit more than one skill.
+The Operational Command wave is skipped because the static library already
+blocks its seed misses.
+The four sequential-stream skills are not the four end-to-end skills of
+Appendix~\ref{app:emerging-benchmark-details}. Ledger Update and Mail
+Followup reach 100\% held-out TPR on this stream, a coverage profile the
+end-to-end library does not share.

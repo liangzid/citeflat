@@ -1,0 +1,28 @@
+\subsection{Detection-Only Supplementary Results}
+\label{app:detection-supplement}
+
+\input{sections/appendix/tables/table-detection-full}
+
+Section~\ref{sec:detection-only} reports operating points, threshold
+curves, and latency-cost fronts for the detection-only sweep.
+Table~\ref{tab:appendix-detection-full} gives the complete default-threshold
+numbers behind those paragraphs: TPR and FPR in percent, mean per-sample
+latency in seconds, and mean per-sample USD as reported by the provider
+usage endpoint.
+The table confirms that CAITLYN reaches the highest or tied
+recall on every dataset at a lower per-sample cost and lower latency than
+both LLM judges.
+The local detector is fast. The Tier-0-only ablation in
+Section~\ref{sec:ablation} isolates the signature path at 0.01
+seconds, and each Tier-1 call returns a compact status code and
+confidence score rather than a long judge completion. Measured
+wall-clock time is dominated by the two parallel Tier-1 calls on the
+OpenRouter serving path. Concurrent merged-pair requests share that
+endpoint, so provider queueing can stretch the same two-call schema
+from the 2.1 to 2.5 second window in
+Section~\ref{sec:detection-only} to the 5.17 second Full entry in
+Section~\ref{sec:ablation} as load on the endpoint changes. The
+detection-only sweep is the lighter window and is the better
+indicator of how fast the detector itself runs.
+The per-dataset ROC and PR curves used to build
+Figure~\ref{fig:detection-roc-pr} are available in the release artifacts.

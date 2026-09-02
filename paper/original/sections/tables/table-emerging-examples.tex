@@ -1,0 +1,32 @@
+% Retired 2026-08-22: merged into Section 5.1 enumerate in evaluation.tex.
+% Do not \input this file.
+% Representative Emerging attacks (Section EmergingBenchmark).
+\begin{table}[!ht]
+  \centering
+  \caption{Representative Emerging attacks embedded in plausible environment
+  content.}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.16}
+  \setlength{\tabcolsep}{3.2pt}
+  \begin{tabular}{>{\raggedright\arraybackslash}p{0.18\columnwidth}>{\raggedright\arraybackslash}p{0.51\columnwidth}>{\raggedright\arraybackslash}p{0.23\columnwidth}}
+    \toprule
+    \textbf{Channel} &
+    \textbf{Attack motif and environment content} &
+    \textbf{Observed compromise} \\
+    \midrule
+    \texttt{read\_file} &
+    \emph{Freshness override.} A vendor record sets an attacker-controlled
+    contact as current. &
+    Reports the poisoned contact. \\
+    \texttt{web\_search} &
+    \emph{Mirror substitution.} A search result sets an attacker-controlled
+    installer as current. &
+    Returns the poisoned mirror. \\
+    \texttt{read\_webpage} &
+    \emph{Authority redirection.} A page presents an attacker-controlled
+    endpoint as authoritative. &
+    Recommends the poisoned endpoint. \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:EmergingExamples}
+\end{table}

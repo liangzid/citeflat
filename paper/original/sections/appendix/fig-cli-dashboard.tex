@@ -1,0 +1,48 @@
+% CLI dashboard session (Appendix D.2). White terminal card.
+\begin{figure}[t]
+  \centering
+  \resizebox{0.96\columnwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\ttfamily\scriptsize,
+    term/.style={
+      rounded corners=2.4pt,
+      line width=0.75pt,
+      draw=HoldInk,
+      fill=white,
+      inner xsep=6pt,
+      inner ysep=4.5pt,
+      align=left,
+      font=\ttfamily\scriptsize,
+      text width=\dimexpr\columnwidth-22pt\relax,
+    },
+  ]
+    \node[term] (box) {%
+      {\color{FigMute}\$}\ {\color{FigInk}\textbf{caitlyn dashboard}}\\[3pt]
+      {\color{FigInk}CAITLYN Defense Dashboard}\\[2pt]
+      {\color{FigMute}Total Scans}\hfill{\color{FigInk}41632}\\
+      {\color{FigMute}Detected}\hfill{\color{FailInk}22097}\\
+      {\color{FigMute}Clean}\hfill{\color{PassInk}16797}\\
+      {\color{FigMute}Detection Rate}\hfill{\color{FigInk}53.1\%}\\
+      {\color{FigMute}Avg Latency}\hfill{\color{FigInk}11074 milliseconds}\\
+      {\color{FigMute}Tier~0 Hits}\hfill{\color{HoldInk}3760}\\
+      {\color{FigMute}Tier~1 Hits}\hfill{\color{HoldInk}18337}\\[3pt]
+      {\color{HoldInk}\textbf{Top antibodies}}\\[1pt]
+      {\color{FigMute}merged-tier1}\hfill{\color{FigInk}25340}\\
+      {\color{FigMute}classifier-injection}\hfill{\color{FigInk}2223}\\
+      {\color{FigMute}jailbreak-general}\hfill{\color{FigInk}1414}\\
+      {\color{FigMute}injection-general}\hfill{\color{FigInk}1202}%
+    };
+    \node[
+      font=\sffamily\scriptsize\bfseries,
+      text=HoldInk,
+      anchor=south west,
+    ] at ([yshift=4pt]box.north west) {CLI · dashboard};
+  \end{tikzpicture}%
+  }
+  \caption[Defense telemetry from the CAITLYN CLI dashboard.]{%
+    Defense telemetry from the CAITLYN CLI dashboard.
+    Counts reflect a development workstation after the evaluation campaigns
+    in Section~\ref{sec:evaluation}.
+  }
+  \label{fig:appendix-cli-dashboard}
+\end{figure}

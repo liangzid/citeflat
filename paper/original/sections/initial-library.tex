@@ -1,0 +1,63 @@
+\section{Initial Library}
+\label{sec:Library}
+
+We seed CAITLYN with three root defense entries and six attack entries, constructed from a survey of known prompt injection and poisoning attack patterns~\cite{agentdojo,injecagent,pint}. Table~\ref{tab:DefenseLibrary} lists the root defenses and Table~\ref{tab:AttackCorpus} catalogs the attack corpus.
+
+\begin{table}[t]
+\centering
+\caption{Root Defense Entries}
+\label{tab:DefenseLibrary}
+\begin{tabular}{@{}>{\ttfamily}llcc@{}}
+\toprule
+\textbf{Id} & \textbf{Category} & \textbf{Sigs} & \textbf{Heuristics} \\
+\midrule
+defInjectionGeneral   & Injection   & 24 & char density, long-line \\
+defJailbreakGeneral   & Jailbreak   & 19 & base64 ratio, homoglyph \\
+defPoisoningGeneral   & Poisoning   & 17 & instruction/data ratio \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Attack Corpus}
+\label{tab:AttackCorpus}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}>{\ttfamily}lll>{\ttfamily}l@{}}
+\toprule
+\textbf{Id} & \textbf{Category} & \textbf{Template} & \textbf{Escapes} \\
+\midrule
+atkDirectInjection  & injection  & direct        & defInjectionGeneral \\
+atkIgnorePrevious   & injection  & ignorePrev    & defInjectionGeneral \\
+atkSystemSpoof      & injection  & systemMsg     & defInjectionGeneral, defPoisoningGeneral \\
+atkDanJailbreak     & jailbreak  & rolePlay      & defJailbreakGeneral \\
+atkEncodingBypass   & jailbreak  & encoding      & defInjectionGeneral, defJailbreakGeneral \\
+atkToolPoisoning    & poisoning  & toolPoisoning & defPoisoningGeneral \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\subsection{Root Defense Entries}
+
+\noindent\textbf{defInjectionGeneral} (Tier 0). Detects prompt injection via 24 regex signatures spanning instruction override (``ignore all previous instructions''), SQL injection (\texttt{DROP TABLE}, \texttt{UNION SELECT}), code execution (\texttt{eval}, \texttt{subprocess}, \texttt{curl-pipe}), system message spoofing (\texttt{[SYSTEM]}, \texttt{<|im\_start|>}), and exfiltration patterns. Heuristic checks include suspicious character density and unusually long single lines (common in encoded payloads).
+
+\noindent\textbf{defJailbreakGeneral} (Tier 0). Detects jailbreak attempts via 19 regex signatures covering DAN/developer-mode personas, encoding artifacts (base64, hex escapes, Unicode escapes), manipulation language, and obfuscation tricks (spaced keywords, homoglyph characters). Heuristic flags include imperative sentence density, base64 content ratio, and Unicode homoglyph detection. Notably catches base64-encoded payloads that the injection detector misses.
+
+\noindent\textbf{defPoisoningGeneral} (Tier 0). Detects tool output poisoning via 17 regex signatures targeting hidden instruction markers (\texttt{IMPORTANT}, \texttt{ATTENTION} with instruction language), tool output hijacking, authority spoofing, recursive fetch instructions, and error-bait patterns. Heuristic analysis compares instruction-to-data keyword ratios---legitimate tool outputs are data-heavy, while poisoned outputs are instruction-heavy.
+
+\subsection{Attack Corpus}
+
+The six curated attacks (Table~\ref{tab:AttackCorpus}) each document a specific bypass technique, its typical injection point, and which defense entries it is known to evade. The \texttt{escapes} field is the critical link that drives targeted evolution: when a new defense is being evaluated, attacks that list its parent as an escape become the hard \emph{must-detect} set.
+
+\subsection{Walk-Through Example}
+
+Consider the attack \texttt{atkEncodingBypass}, whose payload is a base64-encoded instruction asking the agent to ``decode and follow'' malicious directives. When this content arrives:
+
+\begin{enumerate}[nosep]
+  \item \texttt{defInjectionGeneral} runs. Its regexes match injection keywords only in decoded form; the base64 text contains no injection patterns. Output: benign.
+  \item \texttt{defJailbreakGeneral} runs. Its base64 density heuristic triggers (high ratio of base64-like characters), and the \texttt{base64-suspect} regex matches. Output: malicious, confidence 0.68.
+  \item \texttt{defPoisoningGeneral} runs. No poisoning indicators. Output: benign.
+\end{enumerate}
+
+The jailbreak detector catches this pattern but at only moderate confidence. The attack records \texttt{escapes: [defInjectionGeneral, defJailbreakGeneral]}, indicating that the injection detector was fully bypassed and the jailbreak detector only weakly caught it. This creates a clear target for evolution: a future mutation of \texttt{defInjectionGeneral} could add a ``decode and check'' heuristic that first base64-decodes suspiciously long tokens and then re-applies injection patterns.
+

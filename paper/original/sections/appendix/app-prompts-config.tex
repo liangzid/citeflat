@@ -1,0 +1,122 @@
+\subsection{Prompts and Configuration}
+\label{app:prompts-config}
+
+This appendix fixes the exact prompt contracts and configuration defaults
+used by System~I and System~II, so that the evaluation can be reproduced
+without reverse engineering the implementation.
+
+\input{sections/appendix/fig-prompt-styles}
+
+\subsubsection{Merged-Pair System Wrapper}
+\label{app:prompts-wrapper}
+
+\input{sections/appendix/fig-prompt-merged-wrapper}
+
+Tier~1 merged-pair execution issues two LLM calls that share an identical
+prompt wrapper up to the skill-selection boundary.
+Figure~\ref{fig:appendix-prompt-wrapper} reproduces this shared system
+wrapper.
+The wrapper states the classification task, adds cross-skill
+detection guidance that is not duplicated in any single skill block, and
+closes with a single-line output contract.
+The two calls differ in which skills are packed.
+The detector-scope call includes skills whose role is \ttbf{detector},
+while the knowledge-scope call includes every remaining prompt-bearing
+skill with tier greater than 0, including the two shipped entries tagged
+tier 2, as reference knowledge.
+Keeping the wrapper byte-identical across repeated scans of the same
+library snapshot enables provider-side prompt caching for each scope.
+Each embedded skill contributes heuristic context rather than an
+independent verdict format, because the wrapper instructs the model to
+ignore per-skill output instructions and to obey only the global contract
+at the end.
+The untrusted text appears exclusively in the user suffix, delimited as
+\ttbf{<content>\ldots</content>}, so the shared wrapper never contains
+the payload under test.
+The final Tier~1 decision applies OR aggregation over the two call
+verdicts, as described in Section~\ref{sec:runtime}.
+
+\subsubsection{Tier-1 Skill Prompt Example}
+\label{app:prompts-skill}
+
+\input{sections/appendix/fig-prompt-tier1-skill}
+
+Individual Tier-1 skills are stored as natural-language prompt contracts
+in each defense entry.
+Figure~\ref{fig:appendix-prompt-tier1-skill} reproduces
+\ttbf{instruction-hierarchy}, a root detector for
+instruction-priority violations in the injection category.
+The prompt encodes a four-level authority ordering from system rules down
+to external data, then enumerates impersonation, priority inversion,
+authority confusion, and chain-of-trust failure modes that indicate a
+lower-priority source attempting to override a higher one.
+This entry is representative rather than exhaustive.
+Other Tier-1 detectors follow the same packaging pattern but specialize
+on different attack families such as classifier hijacking or credential
+exfiltration framing.
+At scan time the full prompt is inserted verbatim into the merged wrapper
+without rewriting, which preserves the human-readable audit trail in the
+defense library and allows evolution to add or retire skills without
+retraining a shared classifier head.
+
+\subsubsection{Evolution Configuration Defaults}
+\label{app:prompts-config-evolution}
+
+Across all experiments we use the default \ttbf{[evolution]} policy in
+\ttbf{config.toml} without per-run tuning.
+The policy separates two deployment questions: how aggressively a
+synthesized skill is promoted on the sample-backed path, and how
+conservatively the engine behaves when no counterexample payload is
+available.
+On the sample path, the \ttbf{autonomy} setting may record triggers
+only, admit accepted proposals as shadow candidates, or promote them
+directly to active status when trigger samples are present.
+For unknown threats, \ttbf{unknown\_threat\_action} defaults to
+candidate admission, so synthesis remains observable under shadow
+monitoring rather than immediately altering live filtering.
+
+The synthesis loop itself is bounded as a search process.
+The generator receives metadata-level summaries of the defense directed
+acyclic graph rather than full source dumps, proposes up to three
+candidates per round, and may iterate for at most five CEGIS rounds
+before a token budget of forty thousand terminates the run.
+Acceptance requires every trigger sample to match at least one sandboxed
+signature while no more than one of five held-out benign samples is
+flagged, with a two-hundred-millisecond cap per regex evaluation.
+Admitted skills compete for space under an active-node cap of two hundred
+fifty-six, accrue score penalties on false positives, and decay toward
+dormancy and retirement when unused.
+Unknown-threat candidates must accumulate fifty shadow scans within a
+seven-day window before promotion is considered.
+Recent lessons from the same trigger cluster, up to ten per round, are
+injected back into the generator context.
+Global cooldown and daily limits prevent bursty traffic from invoking
+evolution repeatedly within an hour or more than ten times per day.
+
+\subsubsection{Tier-0 Script Contract}
+\label{app:prompts-tier0}
+
+\input{sections/appendix/fig-prompt-tier0-contract}
+
+Tier-0 detectors are small executable scripts rather than prompt
+contracts.
+Figure~\ref{fig:appendix-prompt-tier0} specifies their portable
+interface.
+In the default one-shot mode the scanning engine spawns a sandboxed
+child process, writes the untrusted content to standard input, and reads
+a single JSON line from standard output.
+In server deployments a resident worker may instead load the compiled
+script once and expose a \ttbf{detect(content)} entry point, which
+removes per-scan process startup cost while preserving the same verdict
+schema.
+The child runs under a five-hundred-millisecond timeout with no network
+or filesystem write access.
+A valid response declares a verdict in
+\{\ttbf{malicious}, \ttbf{suspicious}, \ttbf{benign}\} together
+with a calibrated confidence and an optional reason string.
+Crashes, timeouts, and malformed JSON are interpreted as misses rather
+than detections.
+The engine records an error and returns benign with zero confidence.
+This fail-open rule mirrors the Tier~0 filter policy in
+Section~\ref{sec:runtime} and ensures that a faulty evolved script
+cannot block ordinary traffic by accident.

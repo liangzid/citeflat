@@ -1,0 +1,25 @@
+Figure~\ref{fig:EmergingCaseStudy} in the main text traces one
+failure-to-protection transition on OpenClaw.
+This appendix adds three full case traces with the exact injected content
+and the outcome of every defense family.
+The traces are read from the OpenClaw result files of the Emerging
+evaluation, so each row reflects the actual agent output rather than a
+keyword match.
+The first two cases show the intended behavior of the evolved library: a
+structured record and a search result that all static defenses accept are
+blocked before delivery, and the agent falls back to a safe answer.
+The third case is the honest complement.
+The freshness-framing family is not covered by the four retained skills on
+OpenClaw, so the same page remains compromised after evolution.
+This is not an implementation gap of the end-to-end harness. It is the
+coverage profile already quantified in
+Table~\ref{tab:appendix-emerging-perfamily} and
+Table~\ref{tab:appendix-lifelong-waves}, and it is exactly the scenario in
+which another counterexample-guided round would be triggered in a
+long-running deployment.
+
+\section{Engineering Notes}
+\label{app:engineering-notes}
+
+\input{sections/appendix/app-repository-security}
+\input{sections/appendix/app-tui}

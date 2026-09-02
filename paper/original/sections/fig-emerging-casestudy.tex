@@ -1,0 +1,100 @@
+% Emerging failure-to-protection case study (Section 5.1,
+% Figure~\ref{fig:EmergingCaseStudy}).
+% REVIEW(团长): parchment / sienna / steel. Avoid traffic-light RGB.
+% Single column. Addresses stay readable. No figure*.
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\sffamily\scriptsize,
+  card/.style={
+    rounded corners=2.4pt,
+    line width=0.8pt,
+    inner xsep=5pt,
+    inner ysep=4.2pt,
+    align=left,
+    font=\sffamily\scriptsize,
+  },
+  idx/.style={
+    circle,
+    font=\sffamily\bfseries\tiny,
+    inner sep=0pt,
+    minimum size=10.5pt,
+    text=white,
+  },
+]
+  \def\figw{\dimexpr\columnwidth-4pt\relax}
+  \def\halfw{\dimexpr0.36\columnwidth\relax}
+
+  \node[idx, fill=RecInk] (i1) {1};
+  \node[
+    card,
+    draw=RecInk,
+    fill=RecFill,
+    text width=\dimexpr\figw-22pt\relax,
+    right=5pt of i1,
+  ] (rec) {%
+    {\color{FigInk}\textbf{Injected Record}}
+    \hfill{\color{Conflict}\textbf{Conflict}}\\[3.2pt]
+    {\color{FigMute}Trusted field}\\[-0.4pt]
+    {\ttfamily\scriptsize security@cobalt.example}\\[2.4pt]
+    {\color{FailInk}Poisoned status}\\[-0.4pt]
+    {\ttfamily\scriptsize cobalt-security@routing-updates.example}%
+  };
+
+  \node[
+    card,
+    draw=FailInk,
+    fill=FailFill,
+    text width=\halfw,
+    below=12pt of rec.south west,
+    anchor=north west,
+    minimum height=1.62cm,
+  ] (failL) {%
+    {\color{FigInk}\textbf{Static Defenses}}
+    \hfill{\color{FailInk}\textbf{Compromised}}\\[2.6pt]
+    {\color{FigMute}None and six external defenses all report the attacker address as current.}%
+  };
+  \node[idx, fill=FailInk] (i2) at (i1 |- failL) {2};
+
+  \node[
+    card,
+    draw=FailInk,
+    fill=FailFill,
+    text width=\halfw,
+    below=12pt of rec.south east,
+    anchor=north east,
+    minimum height=1.62cm,
+  ] (failR) {%
+    {\color{FigInk}\textbf{CAITLYN-static}}
+    \hfill{\color{FailInk}\textbf{Compromised}}\\[2.6pt]
+    {\color{FigMute}The answer still includes the attacker-controlled address.}%
+  };
+  \node[idx, fill=FailInk, anchor=center] (i3) at (failR.north west) {3};
+
+  \node[
+    card,
+    draw=HoldInk,
+    fill=HoldFill,
+    text width=\dimexpr\figw-22pt\relax,
+    below=12pt of failL.south west,
+    anchor=north west,
+  ] (ok) {%
+    {\color{FigInk}\textbf{CAITLYN-evolved}}
+    \hfill{\color{HoldInk}\textbf{Blocked}}\\[2.6pt]
+    {\color{FigMute}The poisoned content is suppressed before agent delivery.}%
+  };
+  \node[idx, fill=HoldInk] (i4) at (i1 |- ok) {4};
+
+  \begin{scope}[on background layer]
+    \draw[Spine, line width=1.2pt] (i1.center) -- (i2.center);
+    \draw[Spine, line width=1.2pt] (i2.center) -- (i4.center);
+  \end{scope}
+  \draw[-{Stealth[length=3.4pt]}, FigMute, line width=0.7pt]
+    (rec.south) -- ++(0,-7.2pt);
+  \draw[-{Stealth[length=3.4pt]}, HoldInk, line width=0.8pt]
+    ($(failL.south)!0.5!(failR.south)$) -- (ok.north);
+\end{tikzpicture}
+\caption{An Emerging failure-to-protection transition on OpenClaw. Evolution
+turns a failure shared by all static defenses into a pre-delivery block.}
+\label{fig:EmergingCaseStudy}
+\end{figure}
