@@ -1,0 +1,16 @@
+# Editor backups
+*~
+*undo-tree~
+*.~undo-tree~
+
+# Local LaTeX build products (compile paper/original and paper/poisoned locally)
+paper/**/*.aux
+paper/**/*.bbl
+paper/**/*.blg
+paper/**/*.fdb_latexmk
+paper/**/*.fls
+paper/**/*.log
+paper/**/*.out
+paper/**/*.toc
+paper/**/main.pdf
+paper/**/missfont.log
