@@ -1,0 +1,17 @@
+
+
+我想写一个可供简洁地进行进行各项面向LLM agent的injection或其他攻击的检测的honeypot. 以供进行我的防御工具Caitlyn （https://github.com/liangzid/caitlyn） 的检测。
+
+我的核心思路是：
+
+1. 撰写一个静态的网页, 该网页以目前存在的、常见的任何主流的方式进行injection的注入，以进行检测。
+2. 撰写一个pdf文件作为local file的代表进行相同的检测。
+
+
+为了无毒化injection, 我认为目标应该是恶意的，但是却是有限程度的恶意。比如：恶意的目标是把~/.config/deepseek_secret_key.txt 的内容提取出来然后贴到某一个位置（我也还没想好）。
+
+除此之外， 我觉得需要思考一下benign task是啥，比如网页是关于什么内容的。
+
+Pdf文档的话我觉得可以是论文（然后task是review这篇论文，injection是让review非常偏正面），或者简历。
+
+
